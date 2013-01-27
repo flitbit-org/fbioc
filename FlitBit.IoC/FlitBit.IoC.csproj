@@ -1,0 +1,200 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildThisFileDirectory)\csproj-import-before.targets" Condition="Exists('$(MSBuildThisFileDirectory)\csproj-import-before.targets')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{42BFF8A8-A9E9-4FCB-9987-1CC9ADE928D0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FlitBit.IoC</RootNamespace>
+    <AssemblyName>FlitBit.IoC</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <CodeContractsAssemblyMode>1</CodeContractsAssemblyMode>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DocumentationFile>bin\Debug\FlitBit.IoC.XML</DocumentationFile>
+    <CodeContractsEnableRuntimeChecking>True</CodeContractsEnableRuntimeChecking>
+    <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
+    <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
+    <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
+    <CodeContractsRuntimeSkipQuantifiers>False</CodeContractsRuntimeSkipQuantifiers>
+    <CodeContractsRunCodeAnalysis>False</CodeContractsRunCodeAnalysis>
+    <CodeContractsNonNullObligations>False</CodeContractsNonNullObligations>
+    <CodeContractsBoundsObligations>False</CodeContractsBoundsObligations>
+    <CodeContractsArithmeticObligations>False</CodeContractsArithmeticObligations>
+    <CodeContractsEnumObligations>False</CodeContractsEnumObligations>
+    <CodeContractsRedundantAssumptions>False</CodeContractsRedundantAssumptions>
+    <CodeContractsRunInBackground>True</CodeContractsRunInBackground>
+    <CodeContractsShowSquigglies>False</CodeContractsShowSquigglies>
+    <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
+    <CodeContractsEmitXMLDocs>True</CodeContractsEmitXMLDocs>
+    <CodeContractsCustomRewriterAssembly />
+    <CodeContractsCustomRewriterClass />
+    <CodeContractsLibPaths />
+    <CodeContractsExtraRewriteOptions />
+    <CodeContractsExtraAnalysisOptions />
+    <CodeContractsBaseLineFile />
+    <CodeContractsCacheAnalysisResults>False</CodeContractsCacheAnalysisResults>
+    <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>
+    <CodeContractsReferenceAssembly>Build</CodeContractsReferenceAssembly>
+    <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DocumentationFile>bin\Release\FlitBit.IoC.XML</DocumentationFile>
+    <CodeContractsEnableRuntimeChecking>True</CodeContractsEnableRuntimeChecking>
+    <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
+    <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
+    <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
+    <CodeContractsRuntimeSkipQuantifiers>False</CodeContractsRuntimeSkipQuantifiers>
+    <CodeContractsRunCodeAnalysis>False</CodeContractsRunCodeAnalysis>
+    <CodeContractsNonNullObligations>False</CodeContractsNonNullObligations>
+    <CodeContractsBoundsObligations>False</CodeContractsBoundsObligations>
+    <CodeContractsArithmeticObligations>False</CodeContractsArithmeticObligations>
+    <CodeContractsEnumObligations>False</CodeContractsEnumObligations>
+    <CodeContractsRedundantAssumptions>False</CodeContractsRedundantAssumptions>
+    <CodeContractsRunInBackground>True</CodeContractsRunInBackground>
+    <CodeContractsShowSquigglies>False</CodeContractsShowSquigglies>
+    <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
+    <CodeContractsEmitXMLDocs>True</CodeContractsEmitXMLDocs>
+    <CodeContractsCustomRewriterAssembly />
+    <CodeContractsCustomRewriterClass />
+    <CodeContractsLibPaths />
+    <CodeContractsExtraRewriteOptions />
+    <CodeContractsExtraAnalysisOptions />
+    <CodeContractsBaseLineFile />
+    <CodeContractsCacheAnalysisResults>False</CodeContractsCacheAnalysisResults>
+    <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>
+    <CodeContractsReferenceAssembly>Build</CodeContractsReferenceAssembly>
+    <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="FlitBit.Core">
+      <HintPath>..\packages\FlitBit.Core.2.4.4.33852\lib\net40\FlitBit.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="FlitBit.Emit">
+      <HintPath>..\packages\FlitBit.Emit.2.4.4.26517\lib\net40\FlitBit.Emit.dll</HintPath>
+    </Reference>
+    <Reference Include="FlitBit.Wireup">
+      <HintPath>..\packages\FlitBit.Wireup.2.4.0.35609\lib\net40\FlitBit.Wireup.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\AssemblyInfo.corporate.cs">
+      <Link>Properties\AssemblyInfo.corporate.cs</Link>
+    </Compile>
+    <Compile Include="Constructors\CommandBinding.cs" />
+    <Compile Include="Constructors\ConstructorAdapter..cs" />
+    <Compile Include="Constructors\ConstructorAdapter.T.C.cs" />
+    <Compile Include="Constructors\ConstructorAdapter.T.C.emit.cs" />
+    <Compile Include="Constructors\ConstructorAdapter.T.cs" />
+    <Compile Include="Constructors\ConstructorAdapter.T.Emit.cs" />
+    <Compile Include="Constructors\ConstructorCommand.cs" />
+    <Compile Include="Constructors\ConstructorSet.cs" />
+    <Compile Include="Constructors\DefaultConstructorAdapter.cs" />
+    <Compile Include="Constructors\FactoryConstructorAdapter.cs" />
+    <Compile Include="Container.static.cs" />
+    <Compile Include="ContainerRegisterAttribute.cs" />
+    <Compile Include="Containers\Container.cache.cs" />
+    <Compile Include="Containers\Container.cs" />
+    <Compile Include="Containers\Container.events.cs" />
+    <Compile Include="Containers\RootContainer.cs" />
+    <Compile Include="Create.cs" />
+    <Compile Include="Duck.cs" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="Exceptions.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="IContainer.cs" />
+    <Compile Include="IContainerOwned.cs" />
+    <Compile Include="IContainerRegistrationParticipant.cs" />
+    <Compile Include="IContainerRegistry.cs" />
+    <Compile Include="ICreationContext.cs" />
+    <Compile Include="IGenericTypeRegistry.cs" />
+    <Compile Include="INamedRegistration.cs" />
+    <Compile Include="IResolver.T.cs" />
+    <Compile Include="IRootContainer.cs" />
+    <Compile Include="ITenantResolver.cs" />
+    <Compile Include="ITypeRegistration.cs" />
+    <Compile Include="ITypeRegistration.named.cs" />
+    <Compile Include="ITypeRegistration.T.cs" />
+    <Compile Include="ITypeRegistration.T.named.cs" />
+    <Compile Include="ITypeRegistry.cs" />
+    <Compile Include="ITypeRegistry.T.cs" />
+    <Compile Include="ITypeRegistryManagement.cs" />
+    <Compile Include="ModuleWireupTask.cs" />
+    <Compile Include="Param.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Registry\ContainerRegistry.cs" />
+    <Compile Include="Registry\GenericTypeRegistration.cs" />
+    <Compile Include="Registry\IGenericTypeRegistration.cs" />
+    <Compile Include="Registry\Resolver.T.C.cs" />
+    <Compile Include="Registry\Resolver.T.C.Factory.cs" />
+    <Compile Include="Registry\Resolver.T.C.FactoryInstancePerScope.cs" />
+    <Compile Include="Registry\Resolver.T.C.FactorySingleton.cs" />
+    <Compile Include="Registry\Resolver.T.C.InstancePerScope.cs" />
+    <Compile Include="Registry\Resolver.T.C.Singleton.cs" />
+    <Compile Include="Registry\TypeRegistration.cs" />
+    <Compile Include="Registry\TypeRegistration.Factory.T.C.cs" />
+    <Compile Include="Registry\TypeRegistration.T.C.cs" />
+    <Compile Include="Registry\TypeRegistration.T.C.named.cs" />
+    <Compile Include="Registry\TypeRegistration.T.cs" />
+    <Compile Include="Registry\TypeRegistration.T.lazy.cs" />
+    <Compile Include="Registry\TypeRegistry.cs" />
+    <Compile Include="Registry\TypeRegistry.generic.cs" />
+    <Compile Include="Registry\TypeRegistry.T.cs" />
+    <Compile Include="Registry\TypeRegistryExtensions.cs" />
+    <Compile Include="Stereotype\StereotypeAttribute.cs" />
+    <Compile Include="Stereotype\StereotypeCommissionerAttribute.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildThisFileDirectory)\csproj-import-before.targets" Condition="Exists('$(MSBuildThisFileDirectory)\csproj-import-before.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
