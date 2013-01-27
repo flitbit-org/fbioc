@@ -123,4 +123,7 @@
   <data name="Chk_TypeofTIsInterface" xml:space="preserve">
     <value>typeof(T) must be an interface</value>
   </data>
+  <data name="Err_StereotypeBehaviorGeneratedForInterfacesOnly" xml:space="preserve">
+    <value>this stereotypical behavior can only be generated for interfaces</value>
+  </data>
 </root>

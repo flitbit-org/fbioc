@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics.Contracts;
+using FlitBit.IoC.Properties;
 
 namespace FlitBit.IoC.Stereotype
 {
@@ -60,6 +61,15 @@ namespace FlitBit.IoC.Stereotype
 		public virtual bool RegisterStereotypeImplementation<T>(IContainer container)
 		{
 			return false;
+		}
+
+		/// <summary>
+		/// Ensures the type T is an interface.
+		/// </summary>
+		/// <typeparam name="T">type T</typeparam>
+		protected void RequireTypeIsInterface<T>()
+		{
+			Contract.Requires<ArgumentException>(typeof(T).IsInterface, Resources.Err_StereotypeBehaviorGeneratedForInterfacesOnly);
 		}
 	}
 }

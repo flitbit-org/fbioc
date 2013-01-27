@@ -77,5 +77,14 @@ namespace FlitBit.IoC.Properties {
                 return ResourceManager.GetString("Chk_TypeofTIsInterface", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to this stereotypical behavior can only be generated for interfaces.
+        /// </summary>
+        internal static string Err_StereotypeBehaviorGeneratedForInterfacesOnly {
+            get {
+                return ResourceManager.GetString("Err_StereotypeBehaviorGeneratedForInterfacesOnly", resourceCulture);
+            }
+        }
     }
 }
