@@ -4,7 +4,7 @@ using System.Resources;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("FlitBit.IoC")]
-[assembly: AssemblyDescription("Contains the IoC API and utilities for the FlitBit Core Frameworks.")]
+[assembly: AssemblyDescription("Inversion of Control supporting dynamic implementations, and stereotypical behavior contributions.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCulture("")]
 
