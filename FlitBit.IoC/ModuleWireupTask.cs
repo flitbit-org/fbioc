@@ -1,4 +1,8 @@
-﻿using FlitBit.Wireup.Meta;
+﻿#region COPYRIGHT© 2009-2013 Phillip Clark. All rights reserved.
+// For licensing information see License.txt (MIT style licensing).
+#endregion
+
+using FlitBit.Wireup.Meta;
 
 [assembly: FlitBit.IoC.ModuleWireupTask]
 
