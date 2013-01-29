@@ -7,11 +7,11 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using FlitBit.Core;
 using FlitBit.Emit;
+using FlitBit.IoC.Properties;
 using FlitBit.IoC.Registry;
 using FlitBit.IoC.Stereotype;
-using FlitBit.Core;
-using FlitBit.IoC.Properties;
 
 namespace FlitBit.IoC.Containers
 {
@@ -26,7 +26,7 @@ namespace FlitBit.IoC.Containers
 		{
 			IsRoot = isRoot;
 			Key = Guid.NewGuid();
-			Scope = new CleanupScope();
+			Scope = new CleanupScope(true);
 			Registry = new ContainerRegistry(this, null);
 			IsTenant = false;
 			TenantID = null;
@@ -37,7 +37,7 @@ namespace FlitBit.IoC.Containers
 			_parent = parent;
 			_options = options;
 			Key = Guid.NewGuid();
-			Scope = (options.HasFlag(CreationContextOptions.InheritScope)) ? parent.Scope : new CleanupScope();
+			Scope = (options.HasFlag(CreationContextOptions.InheritScope)) ? parent.Scope : new CleanupScope(true);
 			Registry = new ContainerRegistry(this, parent.Registry);
 			IsTenant = parent.IsTenant;
 			TenantID = parent.TenantID;
@@ -48,7 +48,7 @@ namespace FlitBit.IoC.Containers
 			_parent = parent;
 			_options = options;
 			Key = Guid.NewGuid();
-			Scope = (options.HasFlag(CreationContextOptions.InheritScope)) ? parent.Scope : new CleanupScope();
+			Scope = (options.HasFlag(CreationContextOptions.InheritScope)) ? parent.Scope : new CleanupScope(true);
 			Registry = new ContainerRegistry(this, parent.Registry);
 			IsTenant = isTenant;
 			TenantID = tenantID;

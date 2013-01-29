@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Threading;
 using FlitBit.IoC.Registry;
@@ -25,7 +26,8 @@ namespace FlitBit.IoC.Containers
 		}
 
 		public bool SupportsMultipleTenants { get { return _multitenant != null; } }
-		
+
+		[SuppressMessage("Microsoft.Reliability", "CA2000", Justification="Relies on CleanupScope to dispose the registry.")]
 		public ITypeRegistration RegisterMultiTenant<TTenantResolver>() where TTenantResolver : class, ITenantResolver, new()
 		{
 			if (_multitenant != null)
@@ -35,6 +37,7 @@ namespace FlitBit.IoC.Containers
 			return _multitenant.Register<TTenantResolver>();			
 		}
 
+		[SuppressMessage("Microsoft.Reliability", "CA2000", Justification = "Relies on CleanupScope to dispose the registry.")]		
 		public ITypeRegistration RegisterMultiTenant<TTenantResolver>(Func<IContainer, Param[], TTenantResolver> factory) where TTenantResolver: class, ITenantResolver
 		{
 			if (_multitenant != null)
@@ -115,7 +118,7 @@ namespace FlitBit.IoC.Containers
 		public void NotifyWireupTask(Wireup.IWireupCoordinator coordinator, Wireup.Meta.WireupTaskAttribute task, Type target)
 		{
 			var cra = task as ContainerRegisterAttribute;
-			if (cra != null)
+			if (cra != null && target != null)
 			{				
 				var method = ContainerRegisterAttribute.ApplyRegistrationForMethod.MakeGenericMethod(cra.RegistratedForType, target);
 				method.Invoke(cra, new object[] { this });

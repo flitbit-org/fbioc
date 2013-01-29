@@ -89,8 +89,9 @@
     <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FlitBit.Core">
-      <HintPath>..\packages\FlitBit.Core.2.4.4.33852\lib\net40\FlitBit.Core.dll</HintPath>
+    <Reference Include="FlitBit.Core, Version=2.4.7.24035, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\FlitBit.Core.2.4.7.24035\lib\net40\FlitBit.Core.dll</HintPath>
     </Reference>
     <Reference Include="FlitBit.Emit">
       <HintPath>..\packages\FlitBit.Emit.2.4.4.26517\lib\net40\FlitBit.Emit.dll</HintPath>
