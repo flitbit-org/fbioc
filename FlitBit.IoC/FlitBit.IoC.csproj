@@ -89,15 +89,14 @@
     <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FlitBit.Core, Version=2.4.7.24035, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\FlitBit.Core.2.4.7.24035\lib\net40\FlitBit.Core.dll</HintPath>
+    <Reference Include="FlitBit.Core">
+      <HintPath>..\packages\FlitBit.Core.2.4.7.28991\lib\net40\FlitBit.Core.dll</HintPath>
     </Reference>
     <Reference Include="FlitBit.Emit">
-      <HintPath>..\packages\FlitBit.Emit.2.4.4.26517\lib\net40\FlitBit.Emit.dll</HintPath>
+      <HintPath>..\packages\FlitBit.Emit.2.4.7.29906\lib\net40\FlitBit.Emit.dll</HintPath>
     </Reference>
     <Reference Include="FlitBit.Wireup">
-      <HintPath>..\packages\FlitBit.Wireup.2.4.0.35609\lib\net40\FlitBit.Wireup.dll</HintPath>
+      <HintPath>..\packages\FlitBit.Wireup.2.4.0.29762\lib\net40\FlitBit.Wireup.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
