@@ -18,6 +18,7 @@ namespace FlitBit.IoC
 		/// <typeparam name="C">sublcass type C</typeparam>
 		/// <returns>the registration for chaining calls</returns>
 		ITypeRegistration Register<C>() where C : T;
+		
 		/// <summary>
 		/// Registers implementation type C for use when resolving instances of type T.
 		/// </summary>
@@ -25,13 +26,7 @@ namespace FlitBit.IoC
 		/// <param name="parameters">one or more Params to be used when resolving instances of type T</param>
 		/// <returns>the registration for chaining calls</returns>		
 		ITypeRegistration Register<C>(params Param[] parameters) where C : T;
-		/// <summary>
-		/// Registers implementation type C as a named registration for use when resolving instances of type T by name.
-		/// </summary>
-		/// <typeparam name="C">implementation type C</typeparam>
-		/// <param name="name">the name</param>
-		/// <returns>the registration for chaining calls</returns>
-		ITypeRegistration RegisterWithName<C>(string name) where C : T;
+
 		/// <summary>
 		/// Registers a factory for use when resolving instances of type T.
 		/// </summary>
@@ -39,6 +34,24 @@ namespace FlitBit.IoC
 		/// <param name="factory">a factory providing instances of type C</param>
 		/// <returns>the registration for chaining calls</returns>		
 		ITypeRegistration Register<C>(Func<IContainer, Param[], C> factory) where C : T;
+		
+		/// <summary>
+		/// Registers implementation type C as a named registration for use when resolving instances of type T by name.
+		/// </summary>
+		/// <typeparam name="C">implementation type C</typeparam>
+		/// <param name="name">the name</param>
+		/// <returns>the registration for chaining calls</returns>
+		ITypeRegistration RegisterWithName<C>(string name) where C : T;
+
+		/// <summary>
+		/// Registers implementation type C as a named registration for use when resolving instances of type T by name.
+		/// </summary>
+		/// <typeparam name="C">implementation type C</typeparam>
+		/// <param name="name">the name</param>
+		/// <param name="parameters">one or more Params to be used when resolving instances of type T</param>
+		/// <returns>the registration for chaining calls</returns>
+		ITypeRegistration RegisterWithName<C>(string name, params Param[] parameters) where C : T;
+
 		/// <summary>
 		/// Registers a named factory registration for use when resolving instances of type T by name.
 		/// </summary>

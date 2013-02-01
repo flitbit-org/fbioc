@@ -151,5 +151,27 @@ namespace FlitBit.IoC.Tests
 				Assert.AreEqual(args.AnA, ff.AnA);
 			}
 		}
+
+		[TestMethod]
+		public void ContainerCanCreateInstanceAndResolveNamedParameters()
+		{
+			using (var scope = Create.NewContainer())
+			{
+				scope.ForType<A>().RegisterWithName<B>("A").End();
+
+				scope.ForType<L>()
+					.RegisterWithName<O>("O"
+						, Param.Value("Name")
+						, Param.ResolveNamed<A>("A"))
+					.End();
+
+				var l = Create.NewNamed<L>("O");
+				Assert.IsNotNull(l);
+				Assert.IsInstanceOfType(l, typeof(O));
+				var o = l as O;
+				Assert.IsNotNull(o);
+				Assert.IsInstanceOfType(o.AnA, typeof(B));
+			}
+		}
 	}
 }

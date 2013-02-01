@@ -83,6 +83,19 @@ namespace FlitBit.IoC.Tests
 		public string Name { get; protected set; }
 	}
 
+	public class O : L
+	{
+		public string Name { get; set; }
+
+		public A AnA { get; set; }
+
+		public O(string name, A anA)
+		{
+			Name = name;
+			AnA = anA;
+		}
+	}
+
 	public class TenantResolver : ITenantResolver
 	{
 		internal static void PushTenantID(string id)

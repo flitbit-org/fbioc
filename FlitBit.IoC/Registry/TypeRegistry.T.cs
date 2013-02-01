@@ -47,7 +47,7 @@ namespace FlitBit.IoC.Registry
 			get
 			{
 				var r = Current;
-				return r == null 
+				return r == null
 					|| (!r.ScopeBehavior.HasFlag(ScopeBehavior.SpecializationDisallowed));
 			}
 		}
@@ -59,7 +59,7 @@ namespace FlitBit.IoC.Registry
 
 			var current = Current;
 			CheckCanSpecializeRegistration(current);
-			ITypeRegistration<T> reg = (ITypeRegistration<T>)_genericMake.Value.MakeGenericMethod(type).Invoke(this, new object[] { null }); 
+			ITypeRegistration<T> reg = (ITypeRegistration<T>)_genericMake.Value.MakeGenericMethod(type).Invoke(this, new object[] { null });
 			CheckedSetRegistration(reg, current);
 			return reg;
 		}
@@ -84,7 +84,7 @@ namespace FlitBit.IoC.Registry
 			CheckedSetRegistration(result, current);
 			return result;
 		}
-				
+
 		public ITypeRegistration Register<C>(params Param[] parameters) where C : T
 		{
 			var current = Current;
@@ -94,13 +94,28 @@ namespace FlitBit.IoC.Registry
 			return result;
 		}
 
+		public ITypeRegistration Register<C>(Func<IContainer, Param[], C> factory) where C : T
+		{
+			var current = Current;
+			CheckCanSpecializeRegistration(current);
+
+			var reg = new FactoryTypeRegistration<T, C>(Container, factory);
+			CheckedSetRegistration(reg, current);
+			return reg;
+		}
+
 		public ITypeRegistration RegisterWithName<C>(string name) where C : T
+		{
+			return RegisterWithName<C>(name, Param.EmptyParams);
+		}
+
+		public ITypeRegistration RegisterWithName<C>(string name, params Param[] parameters) where C : T
 		{
 			Contract.Assert(name != null);
 			Contract.Assert(name.Length > 0);
 
-			var result = MakeNamedConcreteRegistrationFor<C>(name, null);
-			
+			var result = MakeNamedConcreteRegistrationFor<C>(name, parameters);
+
 			var registry = _named.Value;
 			if (!registry.TryAdd(name, result))
 			{
@@ -114,16 +129,6 @@ namespace FlitBit.IoC.Registry
 				}
 			}
 			return result;
-		}
-
-		public ITypeRegistration Register<C>(Func<IContainer, Param[], C> factory) where C : T
-		{
-			var current = Current;
-			CheckCanSpecializeRegistration(current);
-
-			var reg = new FactoryTypeRegistration<T, C>(Container, factory);
-			CheckedSetRegistration(reg, current);
-			return reg;
 		}
 
 		public ITypeRegistration RegisterWithName<C>(string name, Func<IContainer, Param[], C> factory) where C : T

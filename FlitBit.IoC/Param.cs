@@ -75,6 +75,18 @@ namespace FlitBit.IoC
 		{
 			return new ParamFromContainer<T>();
 		}
+
+		/// <summary>
+		/// Creates a param that will resolve type T from the container by registered name.
+		/// </summary>
+		/// <typeparam name="T">type T</typeparam>
+		/// <param name="name">the registered name</param>
+		/// <returns>a param</returns>
+		public static Param ResolveNamed<T>(string name)
+		{
+			return new ParamFromContainerNamed<T>(name);
+		}
+
 		/// <summary>
 		/// Creates a param with a name and value.
 		/// </summary>
@@ -102,20 +114,24 @@ namespace FlitBit.IoC
 		/// Gets the param's kind.
 		/// </summary>
 		public ParamKind Kind { get; private set; }
+
 		/// <summary>
 		/// Gets the type of the param's value.
 		/// </summary>
 		public Type TypeofValue { get; private set; }
+
 		/// <summary>
 		/// Gets the parameter's value.
 		/// </summary>
 		/// <param name="container">scoping container</param>
 		/// <returns>the param's value</returns>
 		public abstract object GetValue(IContainer container);
+
 		/// <summary>
 		/// Indicates whether the param is named.
 		/// </summary>
 		public bool HasName { get { return Kind.HasFlag(ParamKind.Named); } }
+
 		/// <summary>
 		/// Gets the param's name.
 		/// </summary>
@@ -231,6 +247,22 @@ namespace FlitBit.IoC
 		}
 	}
 
+	internal sealed class ParamFromContainerNamed<T> : Param
+	{
+		private string RegistrationName { get; set; }
+
+		public ParamFromContainerNamed(string registrationName)
+			: base(ParamKind.ContainerSupplied, typeof(T))
+		{
+			RegistrationName = registrationName;
+		}
+
+		public override object GetValue(IContainer container)
+		{
+			return container.NewNamed<T>(RegistrationName);
+		}
+	}
+
 	internal sealed class ParamMissing : Param
 	{
 		string _name;
@@ -263,7 +295,7 @@ namespace FlitBit.IoC
 	/// extensions for the Param class
 	/// </summary>
 	public static class ParamExtensions
-	{		
+	{
 		/// <summary>
 		/// Gets a value from the first parameter of type T.
 		/// </summary>
@@ -327,7 +359,7 @@ namespace FlitBit.IoC
 			}
 			throw new InvalidOperationException(String.Concat("Value not assignable: ", pp[position].TypeofValue.GetReadableFullName()));
 		}
-		
+
 		/// <summary>
 		/// Gets the first parameter from <paramref name="pp"/> that satisfies the predticate.
 		/// </summary>
@@ -345,7 +377,7 @@ namespace FlitBit.IoC
 				case 0: break;
 				case 1: if (predicate(pp[0])) return pp[0]; break;
 				case 2: if (predicate(pp[0])) return pp[0]; if (predicate(pp[1])) return pp[1]; break;
-				case 3:	if (predicate(pp[0])) return pp[0]; if (predicate(pp[1])) return pp[1]; if (predicate(pp[2])) return pp[2]; break;
+				case 3: if (predicate(pp[0])) return pp[0]; if (predicate(pp[1])) return pp[1]; if (predicate(pp[2])) return pp[2]; break;
 				case 4: if (predicate(pp[0])) return pp[0]; if (predicate(pp[1])) return pp[1]; if (predicate(pp[2])) return pp[2]; if (predicate(pp[3])) return pp[3]; break;
 				case 5: if (predicate(pp[0])) return pp[0]; if (predicate(pp[1])) return pp[1]; if (predicate(pp[2])) return pp[2]; if (predicate(pp[3])) return pp[3]; if (predicate(pp[4])) return pp[4]; break;
 				case 6: if (predicate(pp[0])) return pp[0]; if (predicate(pp[1])) return pp[1]; if (predicate(pp[2])) return pp[2]; if (predicate(pp[3])) return pp[3]; if (predicate(pp[4])) return pp[4]; if (predicate(pp[5])) return pp[5]; break;
