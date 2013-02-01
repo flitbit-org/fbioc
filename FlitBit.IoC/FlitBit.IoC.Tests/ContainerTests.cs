@@ -612,7 +612,9 @@ namespace FlitBit.IoC.Tests
 		{
 			Container.Root
 				.ForType<I>()
-					.Register<J>().ResolveAsSingleton()
+					.Register<J>()
+					.ResolveAsSingleton()
+					.DisallowSpecialization()
 					.End();
 
 			I a;
