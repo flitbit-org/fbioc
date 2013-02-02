@@ -11,7 +11,7 @@ using FlitBit.Core;
 using FlitBit.Emit;
 using FlitBit.IoC.Properties;
 using FlitBit.IoC.Registry;
-using FlitBit.IoC.Stereotype;
+using FlitBit.Emit.Meta;
 
 namespace FlitBit.IoC.Containers
 {
@@ -119,12 +119,39 @@ namespace FlitBit.IoC.Containers
 
 		bool TryAutoRegisterFromStereotype<T>()
 		{
+			var self = this;
 			lock (typeof(T).GetLockForType())
 			{
-				foreach (StereotypeAttribute attr in typeof(T).GetCustomAttributes(typeof(StereotypeAttribute), false))
+				foreach (AutoImplementedAttribute attr in typeof(T).GetCustomAttributes(typeof(AutoImplementedAttribute), false))
 				{
-					if (attr.Behaviors == StereotypeBehaviors.AutoImplementedBehavior
-						&& attr.RegisterStereotypeImplementation<T>(this))
+					if (attr.GetImplementation<T>((impl, factory) => {
+						// use the implementation type if provided
+						ITypeRegistration reg = null;
+						if (impl != null)
+						{
+							reg = self.ForType<T>().Register(impl);
+						}
+						else if (factory != null)
+						{
+							reg = self.ForType<T>().Register((c, p) =>
+							{
+								return factory();
+							});
+						}
+						else throw new InvalidOperationException("Must provide either an instance or a factory.");
+						switch (attr.RecommemdedScope)
+						{
+							case FlitBit.Core.Meta.InstanceScopeKind.ContainerScope:
+								reg.ResolveAnInstancePerScope();
+								break;
+							case FlitBit.Core.Meta.InstanceScopeKind.Singleton:
+								reg.ResolveAsSingleton();
+								break;
+							default:
+								reg.ResolveAnInstancePerRequest();
+								break;
+						}
+					}))
 					{
 						return true;
 					}
@@ -135,7 +162,7 @@ namespace FlitBit.IoC.Containers
 
 		bool IsStereotype<T>()
 		{
-			return typeof(T).IsDefined(typeof(StereotypeAttribute), true);
+			return typeof(T).IsDefined(typeof(AutoImplementedAttribute), true);
 		}
 
 		bool TryResolveWithoutRecursion<T>(LifespanTracking tracking, out T instance)
@@ -315,5 +342,11 @@ namespace FlitBit.IoC.Containers
 				return true;
 			}
 		}
+				
+		T Core.Factory.IFactory.CreateInstance<T>()
+		{
+			return this.New<T>();
+		}
+
 	}
 }

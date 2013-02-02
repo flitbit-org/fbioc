@@ -114,6 +114,29 @@ namespace FlitBit.IoC
 			return Container.Current
 				.NewImplementationOf<T>(tracking, impl);
 		}
+
+        /// <summary>
+        /// Creates a new instance of type T for initialization.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static Initialize<T> NewInit<T>()
+        {            
+            return Container.Current
+                .NewInit<T>(LifespanTracking.External);
+        }
+
+        /// <summary>
+        /// Creates a new instance of type T for initialization.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tracking"></param>
+        /// <returns></returns>
+        public static Initialize<T> NewInit<T>(LifespanTracking tracking)
+        {
+            return Container.Current
+                .NewInit<T>(tracking);
+        }
 		/// <summary>
 		/// Resolves a named instance of type T from the container.
 		/// </summary>
