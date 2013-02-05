@@ -3,9 +3,6 @@
 #endregion
 
 using System;
-using System.Collections.Concurrent;
-using FlitBit.IoC.Constructors;
-using System.Threading;
 
 namespace FlitBit.IoC.Registry
 {

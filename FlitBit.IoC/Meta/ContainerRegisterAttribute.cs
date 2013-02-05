@@ -9,7 +9,7 @@ using FlitBit.Core;
 using FlitBit.Emit;
 using FlitBit.Wireup.Meta;
 
-namespace FlitBit.IoC
+namespace FlitBit.IoC.Meta
 {
 	/// <summary>
 	/// Indicates registration behavior.

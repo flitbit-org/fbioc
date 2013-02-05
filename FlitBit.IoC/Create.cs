@@ -31,7 +31,7 @@ namespace FlitBit.IoC
 		{
 			return Container.Current.MakeChildContainer(options);
 		}
-		
+
 		/// <summary>
 		/// Creates a tenant container.
 		/// </summary>
@@ -115,28 +115,116 @@ namespace FlitBit.IoC
 				.NewImplementationOf<T>(tracking, impl);
 		}
 
-        /// <summary>
-        /// Creates a new instance of type T for initialization.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static Initialize<T> NewInit<T>()
-        {            
-            return Container.Current
-                .NewInit<T>(LifespanTracking.External);
-        }
+		/// <summary>
+		/// Creates a new instance of type T for initialization.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		public static Initialize<T> NewInit<T>()
+		{
+			return Container.Current
+					.NewInit<T>(LifespanTracking.External);
+		}
 
-        /// <summary>
-        /// Creates a new instance of type T for initialization.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tracking"></param>
-        /// <returns></returns>
-        public static Initialize<T> NewInit<T>(LifespanTracking tracking)
-        {
-            return Container.Current
-                .NewInit<T>(tracking);
-        }
+		/// <summary>
+		/// Creates a new instance of type T for initialization.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="tracking"></param>
+		/// <returns></returns>
+		public static Initialize<T> NewInit<T>(LifespanTracking tracking)
+		{
+			return Container.Current
+					.NewInit<T>(tracking);
+		}
+
+		/// <summary>
+		/// Creates a new instance of type T and initializes it using the provided initializer.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="initializer"></param>
+		/// <returns></returns>
+		public static T NewInit<T>(Func<IContainer, T, T> initializer)
+		{
+			Contract.Requires<ArgumentNullException>(initializer != null);
+			Contract.Ensures(Contract.Result<T>() != null);
+			return Container.Current.NewInit<T>(initializer);
+		}
+
+		/// <summary>
+		/// Creates a new instance of type T and initializes it using the provided initializer.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="initializer"></param>
+		/// <param name="tracking"></param>
+		/// <returns></returns>
+		public static T NewInit<T>(Func<IContainer, T, T> initializer, LifespanTracking tracking)
+		{
+			Contract.Requires<ArgumentNullException>(initializer != null);
+			Contract.Ensures(Contract.Result<T>() != null);
+			return Container.Current.NewInit<T>(initializer, tracking);
+		}
+
+		/// <summary>
+		/// Creates a new instance of type T as a mutation of type S, using the provided mutator.
+		/// </summary>
+		/// <typeparam name="T">target type T</typeparam>
+		/// <typeparam name="S">source type S</typeparam>
+		/// <param name="source">a source object</param>
+		/// <param name="mutator">a mutator function</param>
+		/// <returns>an instance of type T, initialized from the source object, mutated using the provided mutator.</returns>
+		public static T Mutate<T, S>(S source, Func<IContainer, T, T> mutator)
+		{
+			Contract.Requires<ArgumentNullException>(mutator != null);
+			Contract.Ensures(Contract.Result<T>() != null);
+			return Container.Current.Mutate<T, S>(source, mutator);
+		}
+
+		/// <summary>
+		/// Creates a new instance of type T as a mutation of type S, using the provided mutator.
+		/// </summary>
+		/// <typeparam name="T">target type T</typeparam>
+		/// <typeparam name="S">source type S</typeparam>
+		/// <param name="source">a source object</param>
+		/// <param name="mutator">a mutator function</param>
+		/// <param name="tracking">lifespan tracking for the new instance</param>
+		/// <returns>an instance of type T, initialized from the source object, mutated using the provided mutator.</returns>
+		public static T Mutate<T, S>(S source, Func<IContainer, T, T> mutator, LifespanTracking tracking)
+		{
+			Contract.Requires<ArgumentNullException>(mutator != null);
+			Contract.Ensures(Contract.Result<T>() != null);
+			return Container.Current.Mutate<T, S>(source, mutator, tracking);
+		}
+
+		/// <summary>
+		/// Creates a new instance of type T, initialized from the provided source.
+		/// </summary>
+		/// <typeparam name="T">target type T</typeparam>
+		/// <typeparam name="S">source type S</typeparam>
+		/// <param name="source">a source object</param>
+		/// <returns>an instance of type T, initialized from the source object.</returns>
+		public static T NewCopy<T, S>(S source)
+		{
+			Contract.Requires<ArgumentNullException>(source != null);
+			Contract.Ensures(Contract.Result<T>() != null);
+			return Container.Current.NewCopy<T, S>(source);
+		}
+
+		/// <summary>
+		/// Creates a new instance of type T, initialized from the provided source.
+		/// </summary>
+		/// <typeparam name="T">target type T</typeparam>
+		/// <typeparam name="S">source type S</typeparam>
+		/// <param name="source">a source object</param>
+		/// <param name="tracking">tracking</param>
+		/// <returns>an instance of type T, initialized from the source object.</returns>
+		public static T NewCopy<T, S>(S source, LifespanTracking tracking)
+		{
+			Contract.Requires<ArgumentNullException>(source != null);
+			Contract.Ensures(Contract.Result<T>() != null);
+			return Container.Current.NewCopy<T, S>(source, tracking);
+		}
+
 		/// <summary>
 		/// Resolves a named instance of type T from the container.
 		/// </summary>
@@ -176,6 +264,6 @@ namespace FlitBit.IoC
 			{
 				return Container.Current.ShareContainer();
 			}
-		}				
+		}
 	}
 }

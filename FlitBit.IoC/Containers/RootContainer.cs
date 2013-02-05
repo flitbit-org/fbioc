@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Threading;
 using FlitBit.IoC.Registry;
+using FlitBit.IoC.Meta;
 
 namespace FlitBit.IoC.Containers
 {

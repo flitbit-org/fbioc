@@ -1,17 +1,16 @@
-﻿#region COPYRIGHT© 2009-2013 Phillip Clark. All rights reserved.
-// For licensing information see License.txt (MIT style licensing).
-#endregion
-
-using System;
+﻿using System;
 
 namespace FlitBit.IoC
 {
 	/// <summary>
-	/// Interface for resolvers of target type T
+	/// Interface for resolvers.
 	/// </summary>
-	/// <typeparam name="T">target type T</typeparam>
-	public interface IResolver<T> : IResolver
+	public interface IResolver
 	{
+		/// <summary>
+		/// Gets the type used by the resolver to fullfil resolve requests.
+		/// </summary>
+		Type TargetType { get; }
 		/// <summary>
 		/// Tries to resolve an instance of the type according to its registration.
 		/// </summary>
@@ -20,7 +19,7 @@ namespace FlitBit.IoC
 		/// <param name="name">registered name or null</param>
 		/// <param name="instance">variable where the instance will be returned upon success</param>
 		/// <returns>true if an instance is resolved; otherwise false</returns>
-		bool TryResolve(IContainer container, LifespanTracking tracking, string name, out T instance);
+		bool TryUntypedResolve(IContainer container, LifespanTracking tracking, string name, out object instance);
 		/// <summary>
 		/// Tries to resolve an instance of the type according to its registration.
 		/// </summary>
@@ -30,6 +29,6 @@ namespace FlitBit.IoC
 		/// <param name="instance">variable where the instance will be returned upon success</param>
 		/// <param name="parameters">one or more params to be used in resolving the instance</param>
 		/// <returns>true if an instance is resolved; otherwise false</returns>
-		bool TryResolve(IContainer container, LifespanTracking tracking, string name, out T instance, params Param[] parameters);
+		bool TryUntypedResolve(IContainer container, LifespanTracking tracking, string name, out object instance, params Param[] parameters);
 	}
 }

@@ -166,6 +166,7 @@ namespace FlitBit.IoC
 		/// already present.</param>
 		/// <returns>a cache</returns>
 		C EnsureCache<K, C>(K key, Func<C> factory);
+
 		/// <summary>
 		/// Ensures a cache is registered with the context and returns
 		/// that cache.

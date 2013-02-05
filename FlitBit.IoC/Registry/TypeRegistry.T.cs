@@ -8,9 +8,8 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Threading;
-
-using FlitBit.Emit;
 using FlitBit.Core;
+using FlitBit.Emit;
 
 namespace FlitBit.IoC.Registry
 {

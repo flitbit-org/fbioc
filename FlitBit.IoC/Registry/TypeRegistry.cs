@@ -4,7 +4,6 @@
 
 using System;
 using FlitBit.Core;
-using FlitBit.Emit;
 
 namespace FlitBit.IoC.Registry
 {

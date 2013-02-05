@@ -89,20 +89,21 @@
     <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FlitBit.Copy, Version=2.5.0.43519, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="FlitBit.Copy, Version=2.6.0.23264, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\FlitBit.Copy.2.5.0.43519\lib\net40\FlitBit.Copy.dll</HintPath>
+      <HintPath>..\packages\FlitBit.Copy.2.6.0.23264\lib\net40\FlitBit.Copy.dll</HintPath>
     </Reference>
-    <Reference Include="FlitBit.Core, Version=2.4.8.39627, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="FlitBit.Core, Version=2.4.9.46943, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\FlitBit.Core.2.4.8.39627\lib\net40\FlitBit.Core.dll</HintPath>
+      <HintPath>..\packages\FlitBit.Core.2.4.9.46943\lib\net40\FlitBit.Core.dll</HintPath>
     </Reference>
-    <Reference Include="FlitBit.Emit, Version=2.5.1.43340, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="FlitBit.Emit, Version=2.6.0.22845, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\FlitBit.Emit.2.5.1.43340\lib\net40\FlitBit.Emit.dll</HintPath>
+      <HintPath>..\packages\FlitBit.Emit.2.6.0.22845\lib\net40\FlitBit.Emit.dll</HintPath>
     </Reference>
-    <Reference Include="FlitBit.Wireup">
-      <HintPath>..\packages\FlitBit.Wireup.2.4.0.35609\lib\net40\FlitBit.Wireup.dll</HintPath>
+    <Reference Include="FlitBit.Wireup, Version=2.5.0.25837, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\FlitBit.Wireup.2.5.0.25837\lib\net40\FlitBit.Wireup.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
@@ -128,7 +129,7 @@
     <Compile Include="Constructors\DefaultConstructorAdapter.cs" />
     <Compile Include="Constructors\FactoryConstructorAdapter.cs" />
     <Compile Include="Container.static.cs" />
-    <Compile Include="ContainerRegisterAttribute.cs" />
+    <Compile Include="Meta\ContainerRegisterAttribute.cs" />
     <Compile Include="Containers\Container.cache.cs" />
     <Compile Include="Containers\Container.cs" />
     <Compile Include="Containers\Container.events.cs" />
@@ -147,6 +148,7 @@
     <Compile Include="IGenericTypeRegistry.cs" />
     <Compile Include="INamedRegistration.cs" />
     <Compile Include="Initializable.cs" />
+    <Compile Include="IResolver.cs" />
     <Compile Include="IResolver.T.cs" />
     <Compile Include="IRootContainer.cs" />
     <Compile Include="ITenantResolver.cs" />
@@ -158,7 +160,13 @@
     <Compile Include="ITypeRegistry.T.cs" />
     <Compile Include="ITypeRegistryManagement.cs" />
     <Compile Include="ModuleWireupTask.cs" />
+    <Compile Include="ParamExtensions.cs" />
+    <Compile Include="ParamValueNamed.T.cs" />
     <Compile Include="Param.cs" />
+    <Compile Include="ParamFromContainer.T.cs" />
+    <Compile Include="ParamFromContainerNamed.T.cs" />
+    <Compile Include="ParamMissing.cs" />
+    <Compile Include="ParamValue.T.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

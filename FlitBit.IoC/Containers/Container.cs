@@ -9,9 +9,9 @@ using System.Reflection;
 using System.Threading;
 using FlitBit.Core;
 using FlitBit.Emit;
+using FlitBit.Emit.Meta;
 using FlitBit.IoC.Properties;
 using FlitBit.IoC.Registry;
-using FlitBit.Emit.Meta;
 
 namespace FlitBit.IoC.Containers
 {
@@ -124,7 +124,7 @@ namespace FlitBit.IoC.Containers
 			{
 				foreach (AutoImplementedAttribute attr in typeof(T).GetCustomAttributes(typeof(AutoImplementedAttribute), false))
 				{
-					if (attr.GetImplementation<T>((impl, factory) => {
+					if (attr.GetImplementation<T>(this, (impl, factory) => {
 						// use the implementation type if provided
 						ITypeRegistration reg = null;
 						if (impl != null)
@@ -138,7 +138,11 @@ namespace FlitBit.IoC.Containers
 								return factory();
 							});
 						}
-						else throw new InvalidOperationException("Must provide either an instance or a factory.");
+						else throw new ContainerException(
+							String.Concat(attr.GetType().GetReadableFullName(),
+							" failed provide either an instance or a functor for requested type: ",
+							typeof(T).GetReadableFullName()
+							));
 						switch (attr.RecommemdedScope)
 						{
 							case FlitBit.Core.Meta.InstanceScopeKind.ContainerScope:
@@ -348,5 +352,20 @@ namespace FlitBit.IoC.Containers
 			return this.New<T>();
 		}
 
+		public bool CanConstruct<T>()
+		{
+			IResolver<T> r;
+			return Registry.TryGetResolverForType(out r);
+		}
+
+		public Type GetImplementationType<T>()
+		{
+			IResolver<T> r;
+			if (Registry.TryGetResolverForType(out r))
+			{
+				return r.TargetType;
+			}
+			return null;
+		}
 	}
 }

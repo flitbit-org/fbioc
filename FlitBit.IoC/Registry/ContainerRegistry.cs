@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Concurrent;
-using FlitBit.Emit;
 using FlitBit.Core;
 
 namespace FlitBit.IoC.Registry

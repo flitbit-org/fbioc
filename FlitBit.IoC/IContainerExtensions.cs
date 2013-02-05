@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics.Contracts;
 
 namespace FlitBit.IoC
@@ -68,6 +65,8 @@ namespace FlitBit.IoC
 		{
 			Contract.Requires<ArgumentNullException>(c != null);
 			Contract.Requires<ArgumentNullException>(targetType != null);
+			Contract.Ensures(Contract.Result<object>() != null);
+
 			return c.NewUntyped(LifespanTracking.Default, targetType);
 		}
 
@@ -79,6 +78,8 @@ namespace FlitBit.IoC
 		public static T New<T>(this IContainer c)
 		{
 			Contract.Requires<ArgumentNullException>(c != null);
+			Contract.Ensures(Contract.Result<T>() != null);
+
 			return c.New<T>(LifespanTracking.Default);
 		}
 
@@ -94,6 +95,8 @@ namespace FlitBit.IoC
 		public static T NewWithParams<T>(this IContainer c, params Param[] parameters)
 		{
 			Contract.Requires<ArgumentNullException>(c != null);
+			Contract.Ensures(Contract.Result<T>() != null);
+
 			return c.NewWithParams<T>(LifespanTracking.Default, parameters);
 		}
 
@@ -109,6 +112,7 @@ namespace FlitBit.IoC
 			Contract.Requires<ArgumentNullException>(c != null);
 			Contract.Requires<ArgumentNullException>(name != null, "name cannot be null");
 			Contract.Requires<ArgumentNullException>(name.Length > 0, "name cannot be empty");
+			Contract.Ensures(Contract.Result<T>() != null);
 
 			return c.NewNamed<T>(LifespanTracking.Default, name);
 		}
@@ -128,6 +132,7 @@ namespace FlitBit.IoC
 			Contract.Requires<ArgumentNullException>(c != null);
 			Contract.Requires<ArgumentNullException>(name != null, "name cannot be null");
 			Contract.Requires<ArgumentNullException>(name.Length > 0, "name cannot be empty");
+			Contract.Ensures(Contract.Result<T>() != null);
 
 			return c.NewNamedWithParams<T>(LifespanTracking.Default, name, parameters);
 		}
@@ -142,6 +147,8 @@ namespace FlitBit.IoC
 		public static T NewImplementationOf<T>(this IContainer c, Type implementationType)
 		{
 			Contract.Requires<ArgumentNullException>(c != null);
+			Contract.Ensures(Contract.Result<T>() != null);
+
 			return c.NewImplementationOf<T>(LifespanTracking.Default, implementationType);
 		}
 
@@ -157,55 +164,166 @@ namespace FlitBit.IoC
 		public static T NewImplementationOf<T, C>(this IContainer c, LifespanTracking tracking)
 		{
 			Contract.Requires<ArgumentNullException>(c != null);
+			Contract.Ensures(Contract.Result<T>() != null);
+
 			return c.NewImplementationOf<T>(tracking, typeof(C));
 		}
 
-        /// <summary>
-        /// Creates a new instance of type T for initialization.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="c"></param>
-        /// <returns></returns>
-        public static Initialize<T> NewInit<T>(this IContainer c)
-        {
-            Contract.Requires<ArgumentNullException>(c != null);
+		/// <summary>
+		/// Creates a new instance of type T for initialization.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="c"></param>
+		/// <returns></returns>
+		public static Initialize<T> NewInit<T>(this IContainer c)
+		{
+			Contract.Requires<ArgumentNullException>(c != null);
+			Contract.Ensures(Contract.Result<Initialize<T>>() != null);
 
-            return NewInit<T>(c, LifespanTracking.Default);
-        }
+			return NewInit<T>(c, LifespanTracking.Default);
+		}
 
-        /// <summary>
-        /// Creates a new instance of type T for initialization.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="c"></param>
-        /// <param name="tracking"></param>
-        /// <returns></returns>
-        public static Initialize<T> NewInit<T>(this IContainer c, LifespanTracking tracking)
-        {
-            Contract.Requires<ArgumentNullException>(c != null);
+		/// <summary>
+		/// Creates a new instance of type T for initialization.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="c"></param>
+		/// <param name="tracking"></param>
+		/// <returns></returns>
+		public static Initialize<T> NewInit<T>(this IContainer c, LifespanTracking tracking)
+		{
+			Contract.Requires<ArgumentNullException>(c != null);
+			Contract.Ensures(Contract.Result<Initialize<T>>() != null);
 
-            return new Initialize<T>(c, c.New<T>(tracking));
-        }
+			return new Initialize<T>(c, c.New<T>(tracking));
+		}
 
-        /// <summary>
-        /// Makes a child container from the current container.
-        /// </summary>
-        /// <returns>a child container</returns>
-        public static IContainer MakeChildContainer(this IContainer c)
-        {
-            return MakeChildContainer(c, CreationContextOptions.None);
-        }
-        /// <summary>
-        /// Makes a child container from the current container.
-        /// </summary>
-        /// <param name="c">the container</param>
-        /// <param name="options">creation context options</param>
-        /// <returns>a child container</returns>
-        public static IContainer MakeChildContainer(this IContainer c, CreationContextOptions options)
-        {
-            Contract.Requires<ArgumentNullException>(c != null);
-            return c.MakeChildContainer(options);
-        }
-    }
+		/// <summary>
+		/// Creates a new instance of type T and initializes it using the provided initializer.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="c"></param>
+		/// <param name="initializer"></param>
+		/// <returns></returns>
+		public static T NewInit<T>(this IContainer c, Func<IContainer, T, T> initializer)
+		{
+			Contract.Requires<ArgumentNullException>(c != null);
+			Contract.Requires<ArgumentNullException>(initializer != null);
+			Contract.Ensures(Contract.Result<T>() != null);
+
+			return initializer(c, c.New<T>(LifespanTracking.Default));
+		}
+
+		/// <summary>
+		/// Creates a new instance of type T and initializes it using the provided initializer.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="c"></param>
+		/// <param name="initializer"></param>
+		/// <param name="tracking"></param>
+		/// <returns></returns>
+		public static T NewInit<T>(this IContainer c, Func<IContainer, T, T> initializer, LifespanTracking tracking)
+		{
+			Contract.Requires<ArgumentNullException>(c != null);
+			Contract.Requires<ArgumentNullException>(initializer != null);
+			Contract.Ensures(Contract.Result<T>() != null);
+
+			return initializer(c, c.New<T>(tracking));
+		}
+
+		/// <summary>
+		/// Creates a new instance of type T, initialized from the provided source.
+		/// </summary>
+		/// <typeparam name="T">target type T</typeparam>
+		/// <typeparam name="S">source type S</typeparam>
+		/// <param name="c">a container</param>
+		/// <param name="source">a source object</param>
+		/// <returns>an instance of type T, initialized from the source object.</returns>
+		public static T NewCopy<T, S>(this IContainer c, S source)
+		{
+			Contract.Requires<ArgumentNullException>(c != null);
+			Contract.Ensures(Contract.Result<T>() != null);
+			return NewInit<T>(c, LifespanTracking.Default).Init(source);
+		}
+
+		/// <summary>
+		/// Creates a new instance of type T, initialized from the provided source.
+		/// </summary>
+		/// <typeparam name="T">target type T</typeparam>
+		/// <typeparam name="S">source type S</typeparam>
+		/// <param name="c">a container</param>
+		/// <param name="source">a source object</param>
+		/// <param name="tracking">tracking</param>
+		/// <returns>an instance of type T, initialized from the source object.</returns>
+		public static T NewCopy<T, S>(this IContainer c, S source, LifespanTracking tracking)
+		{
+			Contract.Requires<ArgumentNullException>(c != null);
+			Contract.Ensures(Contract.Result<T>() != null);
+			return NewInit<T>(c, tracking).Init(source);
+		}
+
+		/// <summary>
+		/// Creates a new instance of type T as a mutation of type S, using the provided mutator.
+		/// </summary>
+		/// <typeparam name="T">target type T</typeparam>
+		/// <typeparam name="S">source type S</typeparam>
+		/// <param name="c">a container</param>
+		/// <param name="source">a source object</param>
+		/// <param name="mutator">a mutator function</param>
+		/// <returns>an instance of type T, initialized from the source object, mutated using the provided mutator.</returns>
+		public static T Mutate<T, S>(this IContainer c, S source, Func<IContainer, T, T> mutator)
+		{
+			Contract.Requires<ArgumentNullException>(c != null);
+			Contract.Requires<ArgumentNullException>(mutator != null);
+			Contract.Ensures(Contract.Result<T>() != null);
+			var res = NewInit<T>(c).Init(source);
+			return mutator(c, res);
+		}
+
+		/// <summary>
+		/// Creates a new instance of type T as a mutation of type S, using the provided mutator.
+		/// </summary>
+		/// <typeparam name="T">target type T</typeparam>
+		/// <typeparam name="S">source type S</typeparam>
+		/// <param name="c">a container</param>
+		/// <param name="source">a source object</param>
+		/// <param name="mutator">a mutator function</param>
+		/// <param name="tracking">lifespan tracking for the new instance</param>
+		/// <returns>an instance of type T, initialized from the source object, mutated using the provided mutator.</returns>
+		public static T Mutate<T, S>(this IContainer c, S source, Func<IContainer, T, T> mutator, LifespanTracking tracking)
+		{
+			Contract.Requires<ArgumentNullException>(c != null);
+			Contract.Requires<ArgumentNullException>(mutator != null);
+			Contract.Ensures(Contract.Result<T>() != null);
+			var res = NewInit<T>(c, tracking).Init(source);
+			return mutator(c, res);
+		}
+
+		/// <summary>
+		/// Makes a child container from the current container.
+		/// </summary>
+		/// <returns>a child container</returns>
+		public static IContainer MakeChildContainer(this IContainer c)
+		{
+			Contract.Requires<ArgumentNullException>(c != null);
+			Contract.Ensures(Contract.Result<IContainer>() != null);
+
+			return MakeChildContainer(c, CreationContextOptions.None);
+		}
+
+		/// <summary>
+		/// Makes a child container from the current container.
+		/// </summary>
+		/// <param name="c">the container</param>
+		/// <param name="options">creation context options</param>
+		/// <returns>a child container</returns>
+		public static IContainer MakeChildContainer(this IContainer c, CreationContextOptions options)
+		{
+			Contract.Requires<ArgumentNullException>(c != null);
+			Contract.Ensures(Contract.Result<IContainer>() != null);
+
+			return c.MakeChildContainer(options);
+		}
+	}
 
 }
