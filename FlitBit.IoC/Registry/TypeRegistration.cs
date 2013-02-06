@@ -3,7 +3,6 @@
 #endregion
 
 using System;
-using FlitBit.IoC.Constructors;
 
 namespace FlitBit.IoC.Registry
 {

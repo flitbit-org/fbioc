@@ -6,8 +6,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using FlitBit.Emit;
 using FlitBit.Core;
+using FlitBit.Emit;
 
 namespace FlitBit.IoC.Registry
 {

@@ -83,6 +83,12 @@ namespace FlitBit.IoC.Tests
 		public string Name { get; protected set; }
 	}
 
+	public class N
+	{
+		public int Ordinal { get; set; }
+		public string Name { get; set; }
+	}
+
 	public class O : L
 	{
 		public string Name { get; set; }
@@ -148,6 +154,48 @@ namespace FlitBit.IoC.Tests
 				Assert.IsInstanceOfType(b, typeof(A));
 				Assert.IsInstanceOfType(b, typeof(B));
 				Assert.AreEqual("B", b.Name);
+			}
+		}
+
+		[TestMethod]
+		public void CanInitializeDuringCreate()
+		{
+			var root = Container.Root;
+
+			int counter = 0;
+			root.Subscribe<N>((type, instance, name, kind) =>
+			{
+				Assert.AreEqual(typeof(N), type);
+				Assert.IsNotNull(instance);
+				Assert.IsNull(name);
+				if (kind == CreationEventKind.Created)
+				{
+					Assert.AreEqual(0, instance.Ordinal);
+					Assert.IsNull(instance.Name);
+				}
+				else if (kind == CreationEventKind.Initialized)
+				{
+					Assert.AreEqual(counter, instance.Ordinal);
+					Assert.AreEqual(String.Concat("Name: ", counter), instance.Name);
+				}
+			});
+
+			using (var c = Create.NewContainer())
+			{
+				Assert.IsNotNull(c);
+
+				while (counter++ < 100)
+				{
+					var name = String.Concat("Name: ", counter);
+					var n = c.NewInit<N>().Init(new
+					{
+						Ordinal = counter,
+						Name = name
+					});
+					Assert.IsNotNull(n);
+					Assert.AreEqual(counter, n.Ordinal);
+					Assert.AreEqual(name, n.Name);
+				}
 			}
 		}
 

@@ -3,8 +3,8 @@
 #endregion
 
 using System;
-using System.Threading;
 using System.Diagnostics.Contracts;
+using System.Threading;
 
 
 namespace FlitBit.IoC.Registry

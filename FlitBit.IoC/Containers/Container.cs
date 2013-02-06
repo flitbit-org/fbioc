@@ -9,9 +9,9 @@ using System.Reflection;
 using System.Threading;
 using FlitBit.Core;
 using FlitBit.Emit;
+using FlitBit.Emit.Meta;
 using FlitBit.IoC.Properties;
 using FlitBit.IoC.Registry;
-using FlitBit.IoC.Stereotype;
 
 namespace FlitBit.IoC.Containers
 {
@@ -119,12 +119,43 @@ namespace FlitBit.IoC.Containers
 
 		bool TryAutoRegisterFromStereotype<T>()
 		{
+			var self = this;
 			lock (typeof(T).GetLockForType())
 			{
-				foreach (StereotypeAttribute attr in typeof(T).GetCustomAttributes(typeof(StereotypeAttribute), false))
+				foreach (AutoImplementedAttribute attr in typeof(T).GetCustomAttributes(typeof(AutoImplementedAttribute), false))
 				{
-					if (attr.Behaviors == StereotypeBehaviors.AutoImplementedBehavior
-						&& attr.RegisterStereotypeImplementation<T>(this))
+					if (attr.GetImplementation<T>(this, (impl, factory) => {
+						// use the implementation type if provided
+						ITypeRegistration reg = null;
+						if (impl != null)
+						{
+							reg = self.ForType<T>().Register(impl);
+						}
+						else if (factory != null)
+						{
+							reg = self.ForType<T>().Register((c, p) =>
+							{
+								return factory();
+							});
+						}
+						else throw new ContainerException(
+							String.Concat(attr.GetType().GetReadableFullName(),
+							" failed provide either an instance or a functor for requested type: ",
+							typeof(T).GetReadableFullName()
+							));
+						switch (attr.RecommemdedScope)
+						{
+							case FlitBit.Core.Meta.InstanceScopeKind.ContainerScope:
+								reg.ResolveAnInstancePerScope();
+								break;
+							case FlitBit.Core.Meta.InstanceScopeKind.Singleton:
+								reg.ResolveAsSingleton();
+								break;
+							default:
+								reg.ResolveAnInstancePerRequest();
+								break;
+						}
+					}))
 					{
 						return true;
 					}
@@ -135,7 +166,7 @@ namespace FlitBit.IoC.Containers
 
 		bool IsStereotype<T>()
 		{
-			return typeof(T).IsDefined(typeof(StereotypeAttribute), true);
+			return typeof(T).IsDefined(typeof(AutoImplementedAttribute), true);
 		}
 
 		bool TryResolveWithoutRecursion<T>(LifespanTracking tracking, out T instance)
@@ -314,6 +345,27 @@ namespace FlitBit.IoC.Containers
 				Scope.Dispose();
 				return true;
 			}
+		}
+				
+		T Core.Factory.IFactory.CreateInstance<T>()
+		{
+			return this.New<T>();
+		}
+
+		public bool CanConstruct<T>()
+		{
+			IResolver<T> r;
+			return Registry.TryGetResolverForType(out r);
+		}
+
+		public Type GetImplementationType<T>()
+		{
+			IResolver<T> r;
+			if (Registry.TryGetResolverForType(out r))
+			{
+				return r.TargetType;
+			}
+			return null;
 		}
 	}
 }

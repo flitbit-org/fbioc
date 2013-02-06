@@ -3,7 +3,6 @@
 #endregion
 
 using System;
-using System.Collections.Concurrent;
 using FlitBit.IoC.Constructors;
 
 namespace FlitBit.IoC.Registry
@@ -57,7 +56,6 @@ namespace FlitBit.IoC.Registry
 			var result = TryResolve(container, tracking, name, out temp, parameters);
 			instance = temp;
 			return result;
-		}
-				
+		}				
 	}
 }

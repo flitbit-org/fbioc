@@ -7,8 +7,8 @@ using System;
 using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Threading;
-using FlitBit.IoC.Constructors;
 using FlitBit.Core;
+using FlitBit.IoC.Constructors;
 
 
 namespace FlitBit.IoC.Registry
