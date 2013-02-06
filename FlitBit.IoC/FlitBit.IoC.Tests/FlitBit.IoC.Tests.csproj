@@ -89,10 +89,6 @@
     <Reference Include="FlitBit.Core">
       <HintPath>..\..\packages\FlitBit.Core.2.4.7.28991\lib\net40\FlitBit.Core.dll</HintPath>
     </Reference>
-    <Reference Include="FlitBit.Emit, Version=2.4.7.19130, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\FlitBit.Emit.2.4.7.19130\lib\net40\FlitBit.Emit.dll</HintPath>
-    </Reference>
     <Reference Include="FlitBit.Wireup">
       <HintPath>..\..\packages\FlitBit.Wireup.2.4.0.29762\lib\net40\FlitBit.Wireup.dll</HintPath>
     </Reference>
