@@ -10,7 +10,7 @@
     <projectUrl>http://fbioc.codeplex.com/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Now using independent CleanupScopes for containers, solves long-standing exception on app exit.</releaseNotes>
+    <releaseNotes>Now using independent CleanupScopes for containers, solves long-standing exception on app exit. Also using ContextFlow for nesting and reusing across threads.</releaseNotes>
     <copyright>Copyright 2013</copyright>
   </metadata>
 </package>

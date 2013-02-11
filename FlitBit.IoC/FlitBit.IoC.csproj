@@ -129,6 +129,7 @@
     <Compile Include="Constructors\DefaultConstructorAdapter.cs" />
     <Compile Include="Constructors\FactoryConstructorAdapter.cs" />
     <Compile Include="Container.static.cs" />
+    <Compile Include="Factory\FactoryProvider.cs" />
     <Compile Include="Meta\ContainerRegisterAttribute.cs" />
     <Compile Include="Containers\Container.cache.cs" />
     <Compile Include="Containers\Container.cs" />
@@ -192,6 +193,7 @@
     <Compile Include="Registry\TypeRegistry.generic.cs" />
     <Compile Include="Registry\TypeRegistry.T.cs" />
     <Compile Include="Registry\TypeRegistryExtensions.cs" />
+    <Compile Include="Wireup.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -203,7 +205,9 @@
     <None Include="FlitBit.IoC.nuspec">
       <SubType>Designer</SubType>
     </None>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildThisFileDirectory)\csproj-import-after.targets" Condition="Exists('$(MSBuildThisFileDirectory)\csproj-import-after.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
