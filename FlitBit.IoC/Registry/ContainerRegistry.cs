@@ -109,7 +109,8 @@ namespace FlitBit.IoC.Registry
 			{
 				foreach (var reg in _registrations.Values)
 				{
-					reg.Dispose();
+					var r = reg;
+					Util.Dispose(ref r);
 				}
 				return true;
 			}

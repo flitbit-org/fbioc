@@ -332,16 +332,7 @@ namespace FlitBit.IoC.Registry
 		}
 		protected override bool PerformDispose(bool disposing)
 		{
-			Thread.MemoryBarrier();
-			var current = _current;
-			Thread.MemoryBarrier();
-			if (current != null)
-			{
-				current.Dispose();
-				Thread.MemoryBarrier();
-				_current = null;
-				Thread.MemoryBarrier();
-			}
+			Util.Dispose(ref _current);
 			return disposing;
 		}
 	}

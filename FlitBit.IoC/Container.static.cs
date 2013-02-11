@@ -3,11 +3,11 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Threading;
+using FlitBit.Core.Parallel;
 using FlitBit.IoC.Containers;
 using FlitBit.Wireup;
 
@@ -19,10 +19,7 @@ namespace FlitBit.IoC
 	public static class Container
 	{
 		static readonly string FlitBit_LogicalRoot_Container = "FlitBit_LogicalRoot_Container";
-
-		[ThreadStatic]
-		static Stack<IContainer> __current;
-
+				
 		/// <summary>
 		/// Gets the container assigned to the current thread.
 		/// </summary>
@@ -32,34 +29,11 @@ namespace FlitBit.IoC
 			{
 				Contract.Ensures(Contract.Result<IContainer>() != null);
 
-				var stack = __current;
-				if (stack != null && stack.Count > 0)
-				{
-					return stack.Peek();
-				}
-				return Root;
+				IContainer res;
+				return (ContextFlow.TryPeek<IContainer>(out res)) ? res : Root;
 			}
 		}
-
-		internal static void PushCurrent(IContainer c)
-		{
-			if (__current == null)
-			{
-				__current = new Stack<IContainer>();
-			}
-			__current.Push(c);
-		}
-
-		internal static void PopCurrentIfEquals(IContainer c)
-		{
-			var stack = __current;
-			if (stack != null && stack.Count > 0)
-			{
-				if (stack.Peek() == c)
-					stack.Pop();
-			}
-		}
-
+				
 		/// <summary>
 		/// Identifies the current tenant's container as the logical root container.
 		/// </summary>

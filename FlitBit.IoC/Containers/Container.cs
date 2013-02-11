@@ -9,9 +9,10 @@ using System.Reflection;
 using System.Threading;
 using FlitBit.Core;
 using FlitBit.Emit;
-using FlitBit.Emit.Meta;
+using FlitBit.Meta;
 using FlitBit.IoC.Properties;
 using FlitBit.IoC.Registry;
+using FlitBit.Core.Parallel;
 
 namespace FlitBit.IoC.Containers
 {
@@ -30,7 +31,10 @@ namespace FlitBit.IoC.Containers
 			Registry = new ContainerRegistry(this, null);
 			IsTenant = false;
 			TenantID = null;
-			FlitBit.IoC.Container.PushCurrent(this);
+			if (!isRoot)
+			{
+				ContextFlow.Push<IContainer>(this);
+			}
 		}
 		protected Container(IContainer parent, CreationContextOptions options)
 		{
@@ -41,7 +45,7 @@ namespace FlitBit.IoC.Containers
 			Registry = new ContainerRegistry(this, parent.Registry);
 			IsTenant = parent.IsTenant;
 			TenantID = parent.TenantID;
-			FlitBit.IoC.Container.PushCurrent(this);
+			ContextFlow.Push<IContainer>(this);
 		}
 		protected Container(IContainer parent, CreationContextOptions options, bool isTenant, object tenantID)
 		{
@@ -52,7 +56,7 @@ namespace FlitBit.IoC.Containers
 			Registry = new ContainerRegistry(this, parent.Registry);
 			IsTenant = isTenant;
 			TenantID = tenantID;
-			FlitBit.IoC.Container.PushCurrent(this);
+			ContextFlow.Push<IContainer>(this);
 		}
 
 		public Guid Key { get; private set; }
@@ -339,12 +343,10 @@ namespace FlitBit.IoC.Containers
 			{
 				return false;
 			}
-			else
-			{
-				FlitBit.IoC.Container.PopCurrentIfEquals(this);
-				Scope.Dispose();
-				return true;
-			}
+			ContextFlow.TryPop<IContainer>(this);
+			var scope = this.Scope;
+			Util.Dispose(ref scope);
+			return true;
 		}
 				
 		T Core.Factory.IFactory.CreateInstance<T>()
@@ -366,6 +368,13 @@ namespace FlitBit.IoC.Containers
 				return r.TargetType;
 			}
 			return null;
+		}					 
+
+		public Core.Factory.IFactory Next	{	get; set;	}
+
+		public object ParallelShare()
+		{
+			return ShareContainer();		
 		}
 	}
 }

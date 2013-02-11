@@ -35,7 +35,7 @@ namespace FlitBit.IoC
 	/// <summary>
 	/// Container interface.
 	/// </summary>
-	public interface IContainer : IFactory, IDisposable
+	public interface IContainer : IFactory, IInterrogateDisposable
 	{
 		/// <summary>
 		/// Gets the container's unique ID.
