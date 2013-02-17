@@ -8,11 +8,11 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using FlitBit.Core;
+using FlitBit.Core.Meta;
+using FlitBit.Core.Parallel;
 using FlitBit.Emit;
-using FlitBit.Meta;
 using FlitBit.IoC.Properties;
 using FlitBit.IoC.Registry;
-using FlitBit.Core.Parallel;
 
 namespace FlitBit.IoC.Containers
 {

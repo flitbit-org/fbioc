@@ -89,21 +89,21 @@
     <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FlitBit.Copy">
-      <HintPath>..\packages\FlitBit.Copy.2.6.2\lib\net40\FlitBit.Copy.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="FlitBit.Copy, Version=2.6.3.0, Culture=neutral, PublicKeyToken=38f03d0878531ff3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\FlitBit.Copy.2.6.3\lib\net40\FlitBit.Copy.dll</HintPath>
     </Reference>
-    <Reference Include="FlitBit.Core">
-      <HintPath>..\packages\FlitBit.Core.2.5.0\lib\net40\FlitBit.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="FlitBit.Core, Version=2.7.1.0, Culture=neutral, PublicKeyToken=38f03d0878531ff3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\FlitBit.Core.2.7.1\lib\net40\FlitBit.Core.dll</HintPath>
     </Reference>
-    <Reference Include="FlitBit.Emit">
-      <HintPath>..\packages\FlitBit.Emit.2.7.0\lib\net40\FlitBit.Emit.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="FlitBit.Emit, Version=2.7.1.0, Culture=neutral, PublicKeyToken=38f03d0878531ff3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\FlitBit.Emit.2.7.1\lib\net40\FlitBit.Emit.dll</HintPath>
     </Reference>
-    <Reference Include="FlitBit.Wireup">
-      <HintPath>..\packages\FlitBit.Wireup.2.5.1\lib\net40\FlitBit.Wireup.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="FlitBit.Wireup, Version=2.5.3.0, Culture=neutral, PublicKeyToken=38f03d0878531ff3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\FlitBit.Wireup.2.5.3\lib\net40\FlitBit.Wireup.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>

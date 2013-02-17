@@ -86,20 +86,21 @@
     <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FlitBit.Copy">
-      <HintPath>..\..\packages\FlitBit.Copy.2.6.1\lib\net40\FlitBit.Copy.dll</HintPath>
+    <Reference Include="FlitBit.Copy, Version=2.6.3.0, Culture=neutral, PublicKeyToken=38f03d0878531ff3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\FlitBit.Copy.2.6.3\lib\net40\FlitBit.Copy.dll</HintPath>
     </Reference>
-    <Reference Include="FlitBit.Core">
-      <HintPath>..\..\packages\FlitBit.Core.2.5.0\lib\net40\FlitBit.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="FlitBit.Core, Version=2.7.1.0, Culture=neutral, PublicKeyToken=38f03d0878531ff3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\FlitBit.Core.2.7.1\lib\net40\FlitBit.Core.dll</HintPath>
     </Reference>
-    <Reference Include="FlitBit.Emit">
-      <HintPath>..\..\packages\FlitBit.Emit.2.7.0\lib\net40\FlitBit.Emit.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="FlitBit.Emit, Version=2.7.1.0, Culture=neutral, PublicKeyToken=38f03d0878531ff3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\FlitBit.Emit.2.7.1\lib\net40\FlitBit.Emit.dll</HintPath>
     </Reference>
-    <Reference Include="FlitBit.Wireup">
-      <HintPath>..\..\packages\FlitBit.Wireup.2.5.1\lib\net40\FlitBit.Wireup.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="FlitBit.Wireup, Version=2.5.3.0, Culture=neutral, PublicKeyToken=38f03d0878531ff3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\FlitBit.Wireup.2.5.3\lib\net40\FlitBit.Wireup.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\PublicAssemblies\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll</HintPath>
@@ -131,7 +132,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
