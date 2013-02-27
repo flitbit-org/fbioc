@@ -343,9 +343,12 @@ namespace FlitBit.IoC.Containers
 			{
 				return false;
 			}
-			ContextFlow.TryPop<IContainer>(this);
-			var scope = this.Scope;
-			Util.Dispose(ref scope);
+			if (disposing)
+			{
+				ContextFlow.TryPop<IContainer>(this);
+				var scope = this.Scope;
+				Util.Dispose(ref scope);
+			}
 			return true;
 		}
 				

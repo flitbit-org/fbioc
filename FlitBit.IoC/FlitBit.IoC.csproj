@@ -93,9 +93,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\FlitBit.Copy.2.6.3\lib\net40\FlitBit.Copy.dll</HintPath>
     </Reference>
-    <Reference Include="FlitBit.Core, Version=2.7.1.0, Culture=neutral, PublicKeyToken=38f03d0878531ff3, processorArchitecture=MSIL">
+    <Reference Include="FlitBit.Core, Version=2.8.15.0, Culture=neutral, PublicKeyToken=38f03d0878531ff3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\FlitBit.Core.2.7.1\lib\net40\FlitBit.Core.dll</HintPath>
+      <HintPath>..\packages\FlitBit.Core.2.8.15\lib\net40\FlitBit.Core.dll</HintPath>
     </Reference>
     <Reference Include="FlitBit.Emit, Version=2.7.1.0, Culture=neutral, PublicKeyToken=38f03d0878531ff3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -145,7 +145,6 @@
     <Compile Include="IContainerOwned.cs" />
     <Compile Include="IContainerRegistrationParticipant.cs" />
     <Compile Include="IContainerRegistry.cs" />
-    <Compile Include="ICreationContext.cs" />
     <Compile Include="IGenericTypeRegistry.cs" />
     <Compile Include="INamedRegistration.cs" />
     <Compile Include="Initializable.cs" />

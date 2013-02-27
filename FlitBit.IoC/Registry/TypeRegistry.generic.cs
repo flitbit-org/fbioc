@@ -86,7 +86,10 @@ namespace FlitBit.IoC.Registry
 
 		protected override bool PerformDispose(bool disposing)
 		{
-			Util.Dispose(ref _current);
+			if (disposing)
+			{
+				Util.Dispose(ref _current);
+			}
 			return disposing;
 		}
 

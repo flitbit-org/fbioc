@@ -65,7 +65,7 @@ namespace FlitBit.IoC.Registry
 
 		protected override bool PerformDispose(bool disposing)
 		{
-			return disposing;
+			return true;
 		}
 
 		public abstract IResolver UntypedResolver { get; }
