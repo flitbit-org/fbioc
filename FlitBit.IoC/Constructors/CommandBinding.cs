@@ -71,7 +71,7 @@ namespace FlitBit.IoC.Constructors
 		}
 	}
 
-	internal sealed class CommandBinding_1<T>: CommandBinding<T>
+	internal sealed class CommandBinding_1<T> : CommandBinding<T>
 	{
 		Param _parameter;
 
@@ -87,7 +87,7 @@ namespace FlitBit.IoC.Constructors
 			return Adapter.Execute(container, name, new object[] { _parameter.GetValue(container) });
 		}
 	}
-	internal sealed class CommandBinding_2<T>: CommandBinding<T>
+	internal sealed class CommandBinding_2<T> : CommandBinding<T>
 	{
 		Param[] _parameters;
 
@@ -109,7 +109,7 @@ namespace FlitBit.IoC.Constructors
 			return Adapter.Execute(container, name, parameters);
 		}
 	}
-	internal sealed class CommandBinding_3<T>: CommandBinding<T>
+	internal sealed class CommandBinding_3<T> : CommandBinding<T>
 	{
 		Param[] _parameters;
 
@@ -132,7 +132,7 @@ namespace FlitBit.IoC.Constructors
 			return Adapter.Execute(container, name, parameters);
 		}
 	}
-	internal sealed class CommandBinding_4<T>: CommandBinding<T>
+	internal sealed class CommandBinding_4<T> : CommandBinding<T>
 	{
 		Param[] _parameters;
 
@@ -156,7 +156,7 @@ namespace FlitBit.IoC.Constructors
 			return Adapter.Execute(container, name, parameters);
 		}
 	}
-	internal sealed class CommandBinding_5<T>: CommandBinding<T>
+	internal sealed class CommandBinding_5<T> : CommandBinding<T>
 	{
 		Param[] _parameters;
 
@@ -181,7 +181,7 @@ namespace FlitBit.IoC.Constructors
 			return Adapter.Execute(container, name, parameters);
 		}
 	}
-	internal sealed class CommandBinding_6<T>: CommandBinding<T>
+	internal sealed class CommandBinding_6<T> : CommandBinding<T>
 	{
 		Param[] _parameters;
 
@@ -207,7 +207,7 @@ namespace FlitBit.IoC.Constructors
 			return Adapter.Execute(container, name, parameters);
 		}
 	}
-	internal sealed class CommandBinding_7<T>: CommandBinding<T>
+	internal sealed class CommandBinding_7<T> : CommandBinding<T>
 	{
 		Param[] _parameters;
 
@@ -234,7 +234,7 @@ namespace FlitBit.IoC.Constructors
 			return Adapter.Execute(container, name, parameters);
 		}
 	}
-	internal sealed class CommandBinding_8<T>: CommandBinding<T>
+	internal sealed class CommandBinding_8<T> : CommandBinding<T>
 	{
 		Param[] _parameters;
 
@@ -262,7 +262,7 @@ namespace FlitBit.IoC.Constructors
 			return Adapter.Execute(container, name, parameters);
 		}
 	}
-	internal sealed class CommandBinding_9<T>: CommandBinding<T>
+	internal sealed class CommandBinding_9<T> : CommandBinding<T>
 	{
 		Param[] _parameters;
 
@@ -291,7 +291,7 @@ namespace FlitBit.IoC.Constructors
 			return Adapter.Execute(container, name, parameters);
 		}
 	}
-	internal sealed class CommandBinding_10<T>: CommandBinding<T>
+	internal sealed class CommandBinding_10<T> : CommandBinding<T>
 	{
 		Param[] _parameters;
 
@@ -321,7 +321,7 @@ namespace FlitBit.IoC.Constructors
 			return Adapter.Execute(container, name, parameters);
 		}
 	}
-	internal sealed class CommandBinding_N<T>: CommandBinding<T>
+	internal sealed class CommandBinding_N<T> : CommandBinding<T>
 	{
 		Param[] _parameters;
 
@@ -335,7 +335,7 @@ namespace FlitBit.IoC.Constructors
 		public override T Execute(IContainer container, string name)
 		{
 			return Adapter.Execute(container, name, (from p in _parameters
-																				 select p.GetValue(container)).ToArray());
+													 select p.GetValue(container)).ToArray());
 		}
 
 

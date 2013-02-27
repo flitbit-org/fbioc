@@ -88,7 +88,7 @@ namespace FlitBit.IoC.Constructors
 		public override bool TryMatchAndBind(Param[] parameters, out CommandBinding<T> binding)
 		{
 			var plen = parameters.Length;
-			if (plen == 0 && BoundToSuppliedDefaults && !_isMissingParameters)
+			if (plen == 0 && !_isMissingParameters)
 			{
 				binding = CommandBinding<T>.Create(_adapter.Value, _params);
 				return true;

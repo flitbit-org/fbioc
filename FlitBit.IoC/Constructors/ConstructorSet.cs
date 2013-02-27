@@ -53,11 +53,22 @@ namespace FlitBit.IoC.Constructors
 			}
 
 			var plen = (parameters != null) ? parameters.Length : 0;
-			foreach (var c in constructors.Where(cc => cc.ParameterCount == plen))
+			if (plen > 0)
 			{
-				if (c.TryMatchAndBind(parameters, out command))
+				foreach (var c in constructors.Where(cc => cc.ParameterCount == plen))
 				{
-					_mostRecent = c;
+					if (c.TryMatchAndBind(parameters, out command))
+					{
+						_mostRecent = c;
+						return true;
+					}
+				}
+			}
+			else
+			{
+				var c = constructors.OrderByDescending(ci => ci.ParameterCount).FirstOrDefault();
+				if (c.TryMatchAndBind(Param.EmptyParams, out command))
+				{
 					return true;
 				}
 			}
@@ -69,9 +80,9 @@ namespace FlitBit.IoC.Constructors
 		{
 			var ord = 0;
 			var result = (from c in typeof(C).GetConstructors(BindingFlags.Instance | BindingFlags.Public)
-										let parms = c.GetParameters()
-										orderby parms.Count()
-										select new ConstructorCommand<T, C>(c, _parameters, ord++)).ToArray<ConstructorCommand<T>>();
+						  let parms = c.GetParameters()
+						  orderby parms.Count()
+						  select new ConstructorCommand<T, C>(c, _parameters, ord++)).ToArray<ConstructorCommand<T>>();
 
 			_default = result.FirstOrDefault(c => c.BoundToSuppliedDefaults);
 			if (_default == null)
