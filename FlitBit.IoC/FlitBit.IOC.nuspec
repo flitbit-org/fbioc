@@ -10,7 +10,7 @@
     <projectUrl>http://fbioc.codeplex.com/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Enabled automatic constructor injection.</releaseNotes>
+    <releaseNotes>Enabled automatic constructor injection. Fixed occasional finalizer error.</releaseNotes>
     <copyright>Copyright 2013</copyright>
   </metadata>
 </package>
