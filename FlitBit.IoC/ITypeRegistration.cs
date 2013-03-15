@@ -1,5 +1,7 @@
 ﻿#region COPYRIGHT© 2009-2013 Phillip Clark. All rights reserved.
+
 // For licensing information see License.txt (MIT style licensing).
+
 #endregion
 
 using System;
@@ -7,55 +9,57 @@ using System;
 namespace FlitBit.IoC
 {
 	/// <summary>
-	/// Registration for a type.
+	///   Registration for a type.
 	/// </summary>
 	public interface ITypeRegistration : IContainerRegistrationParticipant
 	{
 		/// <summary>
-		/// The registered type.
-		/// </summary>
-		Type RegisteredType { get; }
-
-		/// <summary>
-		/// The target type.
-		/// </summary>
-		Type TargetType { get; }
-
-		/// <summary>
-		/// Indicates whether the registration is named.
+		///   Indicates whether the registration is named.
 		/// </summary>
 		bool IsNamed { get; }
 
 		/// <summary>
-		/// Gets the registration's scope behavior.
+		///   The registered type.
+		/// </summary>
+		Type RegisteredType { get; }
+
+		/// <summary>
+		///   Gets the registration's scope behavior.
 		/// </summary>
 		ScopeBehavior ScopeBehavior { get; }
 
 		/// <summary>
-		/// Indicates that a type hsould be resolved per request.
+		///   The target type.
 		/// </summary>
-		/// <returns>the registration (for chaining)</returns>
-		ITypeRegistration ResolveAnInstancePerRequest();
+		Type TargetType { get; }
+
 		/// <summary>
-		/// Indicates that a type hsould be resolved per request.
+		///   Gets the registered type's untyped resolver.
 		/// </summary>
-		/// <returns>the registration (for chaining)</returns>
-		ITypeRegistration ResolveAnInstancePerScope();
+		IResolver UntypedResolver { get; }
+
 		/// <summary>
-		/// Indicates that a type hsould be resolved per request.
-		/// </summary>
-		/// <returns>the registration (for chaining)</returns>
-		ITypeRegistration ResolveAsSingleton();
-		/// <summary>
-		/// Indicates that a type hsould be resolved per request.
+		///   Indicates that a type hsould be resolved per request.
 		/// </summary>
 		/// <returns>the registration (for chaining)</returns>
 		ITypeRegistration DisallowSpecialization();
 
 		/// <summary>
-		/// Gets the registered type's untyped resolver.
+		///   Indicates that a type hsould be resolved per request.
 		/// </summary>
-		IResolver UntypedResolver { get; }		
-	}
+		/// <returns>the registration (for chaining)</returns>
+		ITypeRegistration ResolveAnInstancePerRequest();
 
+		/// <summary>
+		///   Indicates that a type hsould be resolved per request.
+		/// </summary>
+		/// <returns>the registration (for chaining)</returns>
+		ITypeRegistration ResolveAnInstancePerScope();
+
+		/// <summary>
+		///   Indicates that a type hsould be resolved per request.
+		/// </summary>
+		/// <returns>the registration (for chaining)</returns>
+		ITypeRegistration ResolveAsSingleton();
+	}
 }

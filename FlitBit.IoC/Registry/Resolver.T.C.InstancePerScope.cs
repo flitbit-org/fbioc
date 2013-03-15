@@ -1,5 +1,7 @@
 ﻿#region COPYRIGHT© 2009-2013 Phillip Clark. All rights reserved.
+
 // For licensing information see License.txt (MIT style licensing).
+
 #endregion
 
 using System;
@@ -8,29 +10,31 @@ using FlitBit.IoC.Constructors;
 
 namespace FlitBit.IoC.Registry
 {
-	internal class InstancePerScopeResolver<T, C>: Resolver<T, C> where C: class, T
+	internal class InstancePerScopeResolver<T, TConcrete> : Resolver<T, TConcrete>
+		where TConcrete : class, T
 	{
 		readonly ConcurrentDictionary<Guid, T> _containerInstances = new ConcurrentDictionary<Guid, T>();
 
-		public InstancePerScopeResolver(ConstructorSet<T, C> constructors)
-			: base(constructors)
-		{
-		}
+		public InstancePerScopeResolver(ConstructorSet<T, TConcrete> constructors)
+			: base(constructors) { }
 
-		public override bool TryResolve(IContainer container, LifespanTracking tracking, string name, out T instance, params Param[] parameters)
+		public override bool TryResolve(IContainer container, LifespanTracking tracking, string name, out T instance,
+			params Param[] parameters)
 		{
 			var kind = CreationEventKind.Reissued;
 
 			CommandBinding<T> command = null;
-			Guid key = container.Key;
-			bool tempIssued = false;
-			T temp = default(T);
+			var key = container.Key;
+			var tempIssued = false;
+			var temp = default(T);
 			while (true)
 			{
 				if (_containerInstances.TryGetValue(key, out instance))
 				{
 					if (tempIssued && IsDisposable)
-						((IDisposable)temp).Dispose();
+					{
+						((IDisposable) temp).Dispose();
+					}
 					break;
 				}
 				if (command == null && !Constructors.TryMatchAndBind(parameters, out command))
@@ -46,16 +50,16 @@ namespace FlitBit.IoC.Registry
 				if (_containerInstances.TryAdd(key, temp))
 				{
 					container.Scope.AddAction(() =>
+					{
+						T value;
+						if (_containerInstances.TryRemove(key, out value))
 						{
-							T value;
-							if (_containerInstances.TryRemove(key, out value))
+							if (IsDisposable)
 							{
-								if (IsDisposable)
-								{
-									((IDisposable)value).Dispose();
-								}
+								((IDisposable) value).Dispose();
 							}
-						});
+						}
+					});
 					instance = temp;
 					kind = CreationEventKind.Created;
 					break;
@@ -65,5 +69,4 @@ namespace FlitBit.IoC.Registry
 			return true;
 		}
 	}
-
 }

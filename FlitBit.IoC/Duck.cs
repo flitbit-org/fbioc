@@ -1,5 +1,7 @@
 ﻿#region COPYRIGHT© 2009-2013 Phillip Clark. All rights reserved.
+
 // For licensing information see License.txt (MIT style licensing).
+
 #endregion
 
 using System;
@@ -17,152 +19,157 @@ using FlitBit.IoC.Properties;
 namespace FlitBit.IoC
 {
 	/// <summary>
-	/// Used by the framework for duck typing dynamic objects.
+	///   Used by the framework for duck typing dynamic objects.
 	/// </summary>
 	public abstract class BasicDuck
 	{
-		object _target;
+		readonly object _target;
 
 		/// <summary>
-		/// Creates a new instance.
+		///   Creates a new instance.
 		/// </summary>
 		/// <param name="source"></param>
 		protected BasicDuck(object source)
 		{
-			Contract.Requires(source != null);
+			Contract.Requires<ArgumentNullException>(source != null);
 			this._target = source;
 		}
 
 		/// <summary>
-		/// Gets a binder for a member property.
+		///   Gets the source object that has been duck typed.
 		/// </summary>
-		/// <param name="member"></param>
-		/// <returns></returns>
-		protected virtual GetMemberBinder MakeGetMemberBinder(string member)
+		public object DuckTarget
 		{
-			return new BasicDuckGetMemberBinder(member);
+			get { return _target; }
 		}
 
 		/// <summary>
-		/// Gets a binder for a member property.
+		///   Gets a binder for a member property.
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		protected virtual SetMemberBinder MakeSetMemberBinder(string member)
-		{
-			return new BasicDuckSetMemberBinder(member);
-		}
+		protected virtual GetMemberBinder MakeGetMemberBinder(string member) { return new BasicDuckGetMemberBinder(member); }
 
 		/// <summary>
-		/// Gets the source object that has been duck typed.
+		///   Gets a binder for a member property.
 		/// </summary>
-		public object DuckTarget { get { return _target; } }
+		/// <param name="member"></param>
+		/// <returns></returns>
+		protected virtual SetMemberBinder MakeSetMemberBinder(string member) { return new BasicDuckSetMemberBinder(member); }
 
 		/// <summary>
-		/// Casts the duck type as target type T
+		///   Casts the duck type as target type T
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
-		protected T CastDuckTarget<T>()
-		{
-			return (T)_target;
-		}
+		protected T CastDuckTarget<T>() { return (T) _target; }
 
 		/// <summary>
-		/// Gets a member by name.
+		///   Gets a member by name.
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
 		protected object GetMember(string member)
 		{
 			if (_target is IDictionary<string, object>)
-				return (_target as IDictionary<string, object>)[member];
-			else
 			{
-				object result;
-				(_target as DynamicObject).TryGetMember(MakeGetMemberBinder(member), out result);
-				return result;
+				return (_target as IDictionary<string, object>)[member];
 			}
+			object result;
+			((DynamicObject) this._target).TryGetMember(MakeGetMemberBinder(member), out result);
+			return result;
 		}
+
 		/// <summary>
-		/// Sets the member by name.
+		///   Sets the member by name.
 		/// </summary>
 		/// <param name="member"></param>
 		/// <param name="val"></param>
 		protected void SetMember(string member, object val)
 		{
 			if (_target is IDictionary<string, object>)
+			{
 				(_target as IDictionary<string, object>)[member] = val;
+			}
 			else
-				(_target as DynamicObject).TrySetMember(MakeSetMemberBinder(member), val);
+			{
+				((DynamicObject) this._target).TrySetMember(MakeSetMemberBinder(member), val);
+			}
 		}
-
 	}
 
 	/// <summary>
-	/// Helper class for getting duck type'd members.
+	///   Helper class for getting duck type'd members.
 	/// </summary>
 	public class BasicDuckGetMemberBinder : GetMemberBinder
 	{
 		/// <summary>
-		/// Creates a new instance.
+		///   Creates a new instance.
 		/// </summary>
 		/// <param name="name"></param>
-		public BasicDuckGetMemberBinder(string name) : base(name, false) { }
+		public BasicDuckGetMemberBinder(string name)
+			: base(name, false) { }
+
 		/// <summary>
-		/// Fallback handler for missing members.
+		///   Fallback handler for missing members.
 		/// </summary>
 		/// <param name="target"></param>
 		/// <param name="errorSuggestion"></param>
 		/// <returns></returns>
-		public override DynamicMetaObject FallbackGetMember(DynamicMetaObject target, DynamicMetaObject errorSuggestion)
-		{
-			return null;
-		}
+		public override DynamicMetaObject FallbackGetMember(DynamicMetaObject target, DynamicMetaObject errorSuggestion) { return null; }
 	}
 
 	/// <summary>
-	/// Helper class for setting duck type'd members.
+	///   Helper class for setting duck type'd members.
 	/// </summary>
 	public class BasicDuckSetMemberBinder : SetMemberBinder
 	{
 		/// <summary>
-		/// Creates a new instance.
+		///   Creates a new instance.
 		/// </summary>
 		/// <param name="name"></param>
-		public BasicDuckSetMemberBinder(string name) : base(name, false) { }
+		public BasicDuckSetMemberBinder(string name)
+			: base(name, false) { }
+
 		/// <summary>
-		/// Fallback handler for missing members.
+		///   Fallback handler for missing members.
 		/// </summary>
 		/// <param name="target"></param>
 		/// <param name="value"></param>
 		/// <param name="errorSuggestion"></param>
 		/// <returns></returns>
-		public override DynamicMetaObject FallbackSetMember(DynamicMetaObject target, DynamicMetaObject value, DynamicMetaObject errorSuggestion)
-		{
-			return null;
-		}
+		public override DynamicMetaObject FallbackSetMember(DynamicMetaObject target, DynamicMetaObject value,
+			DynamicMetaObject errorSuggestion) { return null; }
 	}
 
 	/// <summary>
-	/// Utility class for accomplishing limited duck typing.
+	///   Utility class for accomplishing limited duck typing.
 	/// </summary>
-	public static partial class Duck
+	public static class Duck
 	{
-		static readonly ConstructorInfo BasicDuckConstructor = typeof(BasicDuck).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, new Type[] { typeof(object) }, null);
-		static readonly MethodInfo BasicDuckGetMemberMethod = typeof(BasicDuck).GetMethod("GetMember", BindingFlags.Instance | BindingFlags.NonPublic);
-		static readonly MethodInfo BasicDuckSetMemberMethod = typeof(BasicDuck).GetMethod("SetMember", BindingFlags.Instance | BindingFlags.NonPublic);
-		static readonly MethodInfo BasicDuckCastDuckTargetMethod = typeof(BasicDuck).GetMethod("CastDuckTarget", BindingFlags.Instance | BindingFlags.NonPublic);
-		static readonly MethodInfo BasicDuckGet_DuckTarget = typeof(BasicDuck).GetMethod("get_DuckTarget", BindingFlags.Instance | BindingFlags.Public);
-		static readonly MethodInfo DelegateDynamicInvoke = typeof(Delegate).GetMethod("DynamicInvoke");
+		static readonly MethodInfo BasicDuckCastDuckTargetMethod = typeof(BasicDuck).GetMethod("CastDuckTarget",
+																																													BindingFlags.Instance | BindingFlags.NonPublic);
 
-		private static Lazy<EmittedModule> __duckTypeModule = new Lazy<EmittedModule>(() =>
-		{ return RuntimeAssemblies.DynamicAssembly.DefineModule("DuckTypes", null); },
-			LazyThreadSafetyMode.ExecutionAndPublication
-			);
+		static readonly ConstructorInfo BasicDuckConstructor =
+			typeof(BasicDuck).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, new[] {typeof(object)},
+																			null);
+
+		static readonly MethodInfo BasicDuckGetMemberMethod = typeof(BasicDuck).GetMethod("GetMember",
+																																											BindingFlags.Instance | BindingFlags.NonPublic);
+
+		static readonly MethodInfo BasicDuckGetDuckTarget = typeof(BasicDuck).GetMethod("get_DuckTarget",
+																																										BindingFlags.Instance | BindingFlags.Public);
+
+		static readonly MethodInfo BasicDuckSetMemberMethod = typeof(BasicDuck).GetMethod("SetMember",
+																																											BindingFlags.Instance | BindingFlags.NonPublic);
+
+		static readonly Lazy<EmittedModule> DuckTypeModule =
+			new Lazy<EmittedModule>(() => RuntimeAssemblies.DynamicAssembly.DefineModule("DuckTypes", null),
+															LazyThreadSafetyMode.ExecutionAndPublication
+				);
 
 		/// <summary>
-		/// Creates a duck type proxy over a source object.
+		///   Creates a duck type proxy over a source object.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <param name="source"></param>
@@ -175,26 +182,24 @@ namespace FlitBit.IoC
 
 			var sourceType = source.GetType();
 			var targetType = typeof(T);
-			string typeName = RuntimeAssemblies.PrepareTypeName(targetType, String.Concat("Duck$", sourceType.GetReadableSimpleName().Replace(',', '_').Replace('.', '_')));
+			var typeName = RuntimeAssemblies.PrepareTypeName(targetType,
+																											String.Concat("Duck$", sourceType.GetReadableSimpleName().Replace(',', '_').Replace('.', '_')));
 
 			lock (targetType.GetLockForType())
 			{
-				var module = __duckTypeModule.Value;
-				Type type = module.Builder.GetType(typeName, false, false);
-				if (type == null)
-				{
-					type = BuildDuckType(module, targetType, typeName, sourceType);
-				}
-				return (T)Activator.CreateInstance(type, source);
+				var module = DuckTypeModule.Value;
+				var type = module.Builder.GetType(typeName, false, false) ?? BuildDuckType(module, targetType, typeName, sourceType);
+				return (T) Activator.CreateInstance(type, source);
 			}
 		}
 
-		private static Type BuildDuckType(EmittedModule module, Type targetType, string typeName, Type sourceType)
+		static Type BuildDuckType(EmittedModule module, Type targetType, string typeName, Type sourceType)
 		{
 			var duckType = module.DefineClass(typeName,
-				TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.AutoLayout | TypeAttributes.AnsiClass | TypeAttributes.Sealed | TypeAttributes.BeforeFieldInit,
-				typeof(BasicDuck),
-				Type.EmptyTypes
+																				TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.AutoLayout | TypeAttributes.AnsiClass |
+																					TypeAttributes.Sealed | TypeAttributes.BeforeFieldInit,
+																				typeof(BasicDuck),
+																				Type.EmptyTypes
 				);
 
 			ImplementConstructor(duckType);
@@ -202,7 +207,7 @@ namespace FlitBit.IoC
 			// Implement all interfaces of the target type
 			var set = new HashSet<Type>();
 			ImplementInterface(duckType, sourceType, targetType);
-			foreach (Type intf in targetType.FindInterfaces(new TypeFilter((t, c) => { return !set.Contains(t); }), null))
+			foreach (var intf in targetType.FindInterfaces((t, c) => !set.Contains(t), null))
 			{
 				ImplementInterface(duckType, sourceType, intf);
 			}
@@ -210,7 +215,49 @@ namespace FlitBit.IoC
 			return duckType.Ref.Target;
 		}
 
-		private static void ImplementInterface(EmittedClass duckType, Type sourceType, Type intf)
+		static void ContributeDirectCallToSourceType(MethodInfo method, EmittedMethod impl,
+			Type sourceType, MethodInfo sourceMethod, Type returnType)
+		{
+			impl.ContributeInstructions((m, il) =>
+			{
+				il.Nop();
+				if (returnType != null)
+				{
+					il.DeclareLocal(method.ReturnType);
+				}
+				il.LoadArg_0();
+				il.Call(BasicDuckCastDuckTargetMethod.MakeGenericMethod(sourceType));
+				foreach (var p in impl.Parameters)
+				{
+					il.LoadArg(p.Index + 1);
+				}
+				il.CallVirtual(sourceMethod);
+				if (returnType != null)
+				{
+					il.StoreLocal_0();
+					il.LoadLocal_0();
+				}
+			});
+		}
+
+		/// <summary>
+		///   Overrides the base constructor on the concrete type.
+		/// </summary>
+		/// <param name="type"></param>
+		static void ImplementConstructor(EmittedClass type)
+		{
+			var ctor = type.DefineCtor();
+			ctor.DefineParameter("source", typeof(Object));
+			ctor.ContributeInstructions((m, il) =>
+			{
+				il.LoadArg_0();
+				il.LoadArg_1();
+				il.Call(BasicDuckConstructor);
+				il.Nop();
+			});
+		}
+
+		static void ImplementInterface(EmittedClass duckType, Type sourceType, Type intf)
 		{
 			if (typeof(IDynamicMetaObjectProvider).IsAssignableFrom(sourceType))
 			{
@@ -222,28 +269,23 @@ namespace FlitBit.IoC
 			}
 		}
 
-		private static void ImplementIntefaceProxyByAssignmentCompatibility(EmittedClass duckType, Type sourceType, Type intf)
-		{
-			throw new NotImplementedException();
-		}
-
-		private static void ImplementInterfaceProxyForDynamicType(EmittedClass duckType, Type sourceType, Type intf)
+		static void ImplementInterfaceProxyForDynamicType(EmittedClass duckType, Type sourceType, Type intf)
 		{
 			duckType.AddInterfaceImplementation(intf);
 
 			foreach (var member in intf.GetProperties())
 			{
-				ImplementPropertyProxyForDynamicType(duckType, sourceType, member);
+				ImplementPropertyProxyForDynamicType(duckType, member);
 			}
 			foreach (var member in intf.GetMethods().Where(m =>
-				m.Name.StartsWith("get_") == false
-				&& m.Name.StartsWith("set_") == false))
+																											m.Name.StartsWith("get_") == false
+																												&& m.Name.StartsWith("set_") == false))
 			{
 				ImplementMethodProxyForDynamic(duckType, sourceType, member);
 			}
 		}
 
-		private static void ImplementInterfaceProxyForSourceType(EmittedClass duckType, Type sourceType, Type intf)
+		static void ImplementInterfaceProxyForSourceType(EmittedClass duckType, Type sourceType, Type intf)
 		{
 			duckType.AddInterfaceImplementation(intf);
 
@@ -252,24 +294,26 @@ namespace FlitBit.IoC
 				ImplementPropertyProxyForSourceType(duckType, sourceType, member);
 			}
 			foreach (var member in intf.GetMethods().Where(m =>
-				m.Name.StartsWith("get_") == false
-				&& m.Name.StartsWith("set_") == false))
+																											m.Name.StartsWith("get_") == false
+																												&& m.Name.StartsWith("set_") == false))
 			{
 				ImplementMethodProxyForSourceType(duckType, sourceType, member);
 			}
 		}
 
-		private static void ImplementMethodProxyForDynamic(EmittedClass duckType, Type sourceType, MethodInfo method)
+		static void ImplementMethodProxyForDynamic(EmittedClass duckType, Type sourceType, MethodInfo method)
 		{
 			var impl = duckType.DefineOverrideMethod(method);
 			var sourceMethod = sourceType.GetMethod(method.Name, impl.ParameterTypes, null);
 
-			var returnType = impl.ReturnType.Target ?? null;
+			var returnType = impl.ReturnType.Target;
 			if (returnType == typeof(void))
+			{
 				returnType = null;
+			}
 			if (sourceMethod != null && sourceMethod.ReturnType == method.ReturnType)
 			{
-				ContributeDirectCallToSourceType(duckType, method, impl, sourceType, sourceMethod, returnType);
+				ContributeDirectCallToSourceType(method, impl, sourceType, sourceMethod, returnType);
 			}
 			else
 			{
@@ -299,7 +343,7 @@ namespace FlitBit.IoC
 					il.LoadLocal_0();
 					il.NewArr(typeof(object), impl.Parameters.Count());
 					il.StoreLocal_2();
-					if (impl.Parameters.Count() > 0)
+					if (impl.Parameters.Any())
 					{
 						foreach (var p in impl.Parameters)
 						{
@@ -332,12 +376,14 @@ namespace FlitBit.IoC
 					il.ThrowException(typeof(NotImplementedException));
 					il.MarkLabel(success);
 					if (returnType != null)
+					{
 						il.LoadLocal_3();
+					}
 				});
 			}
 		}
 
-		private static void ImplementMethodProxyForSourceType(EmittedClass duckType, Type sourceType, MethodInfo method)
+		static void ImplementMethodProxyForSourceType(EmittedClass duckType, Type sourceType, MethodInfo method)
 		{
 			// GENERATES:
 			// [return] base.CastDuckTarget<${sourceType}>().${method}(new object[] { [arg1, arg2, ...] });
@@ -345,12 +391,14 @@ namespace FlitBit.IoC
 			var impl = duckType.DefineOverrideMethod(method);
 			var sourceMethod = sourceType.GetMethod(method.Name, impl.ParameterTypes, null);
 
-			var returnType = impl.ReturnType.Target ?? null;
+			var returnType = impl.ReturnType.Target;
 			if (returnType == typeof(void))
+			{
 				returnType = null;
+			}
 			if (sourceMethod != null)
 			{
-				ContributeDirectCallToSourceType(duckType, method, impl, sourceType, sourceMethod, returnType);
+				ContributeDirectCallToSourceType(method, impl, sourceType, sourceMethod, returnType);
 			}
 			else
 			{
@@ -362,31 +410,46 @@ namespace FlitBit.IoC
 			}
 		}
 
-		private static void ContributeDirectCallToSourceType(EmittedClass duckType, MethodInfo method, EmittedMethod impl, Type sourceType, MethodInfo sourceMethod, Type returnType)
+		static void ImplementPropertyProxyForDynamicType(EmittedClass duckType, PropertyInfo property)
 		{
-			impl.ContributeInstructions((m, il) =>
+			EmittedProperty prop;
+			if (!duckType.TryGetProperty(property.Name, out prop))
 			{
-				il.Nop();
-				if (returnType != null)
+				prop = duckType.DefinePropertyFromPropertyInfo(property);
+			}
+			if (property.CanRead && prop.Getter == null)
+			{
+				var getter = prop.AddGetter();
+				getter.ContributeInstructions((m, il) =>
 				{
-					il.DeclareLocal(method.ReturnType);
-				}
-				il.LoadArg_0();
-				il.Call(BasicDuckCastDuckTargetMethod.MakeGenericMethod(sourceType));
-				foreach (var p in impl.Parameters)
-				{
-					il.LoadArg(p.Index + 1);
-				}
-				il.CallVirtual(sourceMethod);
-				if (returnType != null)
-				{
+					il.DeclareLocal(property.PropertyType);
+					il.Nop();
+					il.LoadArg_0();
+					il.LoadValue(property.Name);
+					il.Call(BasicDuckGetMemberMethod);
+					if (property.PropertyType.IsValueType)
+					{
+						il.UnboxAny(property.PropertyType);
+					}
 					il.StoreLocal_0();
 					il.LoadLocal_0();
-				}
-			});
+				});
+			}
+			if (property.CanWrite && prop.Setter == null)
+			{
+				var setter = prop.AddSetter();
+				setter.ContributeInstructions((m, il) =>
+				{
+					il.Nop();
+					il.LoadArg_0();
+					il.LoadValue(property.Name);
+					il.LoadArg_1();
+					il.Call(BasicDuckSetMemberMethod);
+				});
+			}
 		}
 
-		private static void ImplementPropertyProxyForSourceType(EmittedClass duckType, Type sourceType, PropertyInfo property)
+		static void ImplementPropertyProxyForSourceType(EmittedClass duckType, Type sourceType, PropertyInfo property)
 		{
 			EmittedProperty prop;
 			var sourceProperty = sourceType.GetProperty(property.Name);
@@ -403,7 +466,7 @@ namespace FlitBit.IoC
 					{
 						il.Nop();
 						il.LoadValue(String.Concat(sourceType.GetReadableSimpleName(), " does not implement the property: ", property.Name));
-						il.NewObj(typeof(NotImplementedException).GetConstructor(new Type[] { typeof(String) }));
+						il.NewObj(typeof(NotImplementedException).GetConstructor(new[] {typeof(String)}));
 						il.Throw();
 					}
 					else
@@ -411,7 +474,7 @@ namespace FlitBit.IoC
 						il.DeclareLocal(sourceType);
 						il.DeclareLocal(property.PropertyType);
 						il.LoadArg_0();
-						il.Call(BasicDuckGet_DuckTarget);
+						il.Call(BasicDuckGetDuckTarget);
 						if (sourceType.IsValueType)
 						{
 							il.UnboxAny(sourceType);
@@ -437,10 +500,16 @@ namespace FlitBit.IoC
 					{
 						il.Nop();
 						if (sourceProperty == null)
-							il.LoadValue(String.Concat(sourceType.GetReadableSimpleName(), " does not implement the property: ", property.Name));
+						{
+							il.LoadValue(String.Concat(sourceType.GetReadableSimpleName(), " does not implement the property: ",
+																				property.Name));
+						}
 						else
-							il.LoadValue(String.Concat(sourceType.GetReadableSimpleName(), "'s ", property.Name, " property does not have a setter."));
-						il.NewObj(typeof(NotImplementedException).GetConstructor(new Type[] { typeof(String) }));
+						{
+							il.LoadValue(String.Concat(sourceType.GetReadableSimpleName(), "'s ", property.Name,
+																				" property does not have a setter."));
+						}
+						il.NewObj(typeof(NotImplementedException).GetConstructor(new[] {typeof(String)}));
 						il.Throw();
 					}
 					else
@@ -448,7 +517,7 @@ namespace FlitBit.IoC
 						il.DeclareLocal(sourceType);
 						il.DeclareLocal(property.PropertyType);
 						il.LoadArg_0();
-						il.Call(BasicDuckGet_DuckTarget);
+						il.Call(BasicDuckGetDuckTarget);
 						if (sourceType.IsValueType)
 						{
 							il.UnboxAny(sourceType);
@@ -465,60 +534,6 @@ namespace FlitBit.IoC
 					}
 				});
 			}
-		}
-
-		private static void ImplementPropertyProxyForDynamicType(EmittedClass duckType, Type sourceType, PropertyInfo property)
-		{
-			EmittedProperty prop;
-			if (!duckType.TryGetProperty(property.Name, out prop))
-			{
-				prop = duckType.DefinePropertyFromPropertyInfo(property);
-			}
-			if (property.CanRead && prop.Getter == null)
-			{
-				var getter = prop.AddGetter();
-				getter.ContributeInstructions((m, il) =>
-				{
-					il.DeclareLocal(property.PropertyType);
-					il.Nop();
-					il.LoadArg_0();
-					il.LoadValue(property.Name);
-					il.Call(BasicDuckGetMemberMethod);
-					if (property.PropertyType.IsValueType)
-						il.UnboxAny(property.PropertyType);
-					il.StoreLocal_0();
-					il.LoadLocal_0();
-				});
-			}
-			if (property.CanWrite && prop.Setter == null)
-			{
-				var setter = prop.AddSetter();
-				setter.ContributeInstructions((m, il) =>
-				{
-					il.Nop();
-					il.LoadArg_0();
-					il.LoadValue(property.Name);
-					il.LoadArg_1();
-					il.Call(BasicDuckSetMemberMethod);
-				});
-			}
-		}
-
-		/// <summary>
-		/// Overrides the base constructor on the concrete type.
-		/// </summary>
-		/// <param name="type"></param>
-		private static void ImplementConstructor(EmittedClass type)
-		{
-			var ctor = type.DefineCtor();
-			var source = ctor.DefineParameter("source", typeof(Object));
-			ctor.ContributeInstructions((m, il) =>
-			{
-				il.LoadArg_0();
-				il.LoadArg_1();
-				il.Call(BasicDuckConstructor);
-				il.Nop();
-			});
 		}
 	}
 }

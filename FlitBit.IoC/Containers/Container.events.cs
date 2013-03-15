@@ -1,65 +1,22 @@
 ﻿#region COPYRIGHT© 2009-2013 Phillip Clark. All rights reserved.
+
 // For licensing information see License.txt (MIT style licensing).
+
 #endregion
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using FlitBit.Core;
 
 namespace FlitBit.IoC.Containers
 {
-	internal partial class Container : Disposable, IContainer
+	internal partial class Container
 	{
-		interface IObservationKey
-		{
-			Type TargetType { get; }
-			void AddObserver(Delegate observer);
-		}
-		class ObservationKey<T> : IObservationKey
-		{
-			readonly object _innerLock = new Object();
-			readonly List<Action<Type, T, string, CreationEventKind>> _observers = new List<Action<Type, T, string, CreationEventKind>>();
-			List<WeakReference<T>> _instances;
+		readonly Lazy<Dictionary<Type, IObservationKey>> _observers =
+			new Lazy<Dictionary<Type, IObservationKey>>(LazyThreadSafetyMode.PublicationOnly);
 
-			public ObservationKey(bool tracking)
-			{
-				if (tracking)
-					_instances = new List<WeakReference<T>>();
-			}
-			public Type TargetType { get { return typeof(T); } }
-
-			public void AddObserver(Delegate observer)
-			{
-				lock (_innerLock)
-				{
-					_observers.Add((Action<Type, T, string, CreationEventKind>)observer);
-				}
-			}
-
-			internal void NotifyObservers(Type requestedType, T instance, string name, CreationEventKind evt)
-			{
-				if (_instances != null)
-				{
-					_instances.Add(new WeakReference<T>(instance));
-				}
-				foreach (var observer in _observers)
-				{
-					observer(requestedType, instance, name, evt);
-				}
-			}
-			internal IEnumerable<T> Instances
-			{
-				get
-				{
-					if (_instances == null) return new T[0];
-					else return from i in _instances
-											where i.IsAlive
-											select i.StrongTarget;
-				}
-			}
-		}
-		Lazy<Dictionary<Type, IObservationKey>> _observers = new Lazy<Dictionary<Type, IObservationKey>>(System.Threading.LazyThreadSafetyMode.PublicationOnly);
+		#region IContainer Members
 
 		public void Subscribe<T>(Action<Type, T, string, CreationEventKind> observer)
 		{
@@ -79,7 +36,7 @@ namespace FlitBit.IoC.Containers
 			IObservationKey key;
 			if (observers.TryGetValue(typeof(T), out key))
 			{
-				ObservationKey<T> okey = key as ObservationKey<T>;
+				var okey = key as ObservationKey<T>;
 				if (okey != null)
 				{
 					okey.NotifyObservers(requestedType, instance, name, evt);
@@ -89,6 +46,61 @@ namespace FlitBit.IoC.Containers
 			{
 				_parent.NotifyObserversOfCreationEvent(requestedType, instance, name, evt);
 			}
+		}
+
+		#endregion
+
+		interface IObservationKey
+		{
+			Type TargetType { get; }
+			void AddObserver(Delegate observer);
+		}
+
+		class ObservationKey<T> : IObservationKey
+		{
+			readonly object _innerLock = new Object();
+
+			readonly List<Action<Type, T, string, CreationEventKind>> _observers =
+				new List<Action<Type, T, string, CreationEventKind>>();
+
+			readonly List<WeakReference<T>> _instances;
+
+			public ObservationKey(bool tracking)
+			{
+				if (tracking)
+				{
+					_instances = new List<WeakReference<T>>();
+				}
+			}
+
+			internal void NotifyObservers(Type requestedType, T instance, string name, CreationEventKind evt)
+			{
+				if (_instances != null)
+				{
+					_instances.Add(new WeakReference<T>(instance));
+				}
+				foreach (var observer in _observers)
+				{
+					observer(requestedType, instance, name, evt);
+				}
+			}
+
+			#region IObservationKey Members
+
+			public Type TargetType
+			{
+				get { return typeof(T); }
+			}
+
+			public void AddObserver(Delegate observer)
+			{
+				lock (_innerLock)
+				{
+					_observers.Add((Action<Type, T, string, CreationEventKind>) observer);
+				}
+			}
+
+			#endregion
 		}
 	}
 }

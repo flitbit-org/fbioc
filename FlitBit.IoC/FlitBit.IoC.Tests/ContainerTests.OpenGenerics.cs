@@ -1,5 +1,7 @@
 ﻿#region COPYRIGHT© 2009-2012 Phillip Clark. All rights reserved.
+
 // For licensing information see License.txt (MIT style licensing).
+
 #endregion
 
 using System;
@@ -7,18 +9,29 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FlitBit.IoC.Tests
 {
-	public interface IOpenGeneric<T,U>
+	public interface IOpenGeneric<T, U>
 	{
 		Type TypeofT { get; }
 		Type TypeofU { get; }
 	}
 
-	public class OpenGeneric<T,U> : IOpenGeneric<T,U>
+	public class OpenGeneric<T, U> : IOpenGeneric<T, U>
 	{
-		public Type TypeofT { get { return typeof(T); } }
-		public Type TypeofU { get { return typeof(U); } }
+		#region IOpenGeneric<T,U> Members
+
+		public Type TypeofT
+		{
+			get { return typeof(T); }
+		}
+
+		public Type TypeofU
+		{
+			get { return typeof(U); }
+		}
+
+		#endregion
 	}
-		
+
 	public partial class ContainerTests
 	{
 		[TestMethod]
@@ -26,8 +39,8 @@ namespace FlitBit.IoC.Tests
 		{
 			var root = Container.Root;
 			root.ForGenericType(typeof(IOpenGeneric<,>))
-				.Register(typeof(OpenGeneric<,>))
-				.End();
+					.Register(typeof(OpenGeneric<,>))
+					.End();
 
 			using (var c = Create.NewContainer())
 			{

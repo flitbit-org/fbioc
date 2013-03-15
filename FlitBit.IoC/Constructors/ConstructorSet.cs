@@ -1,7 +1,8 @@
 ﻿#region COPYRIGHT© 2009-2013 Phillip Clark. All rights reserved.
-// For licensing information see License.txt (MIT style licensing).
-#endregion
 
+// For licensing information see License.txt (MIT style licensing).
+
+#endregion
 
 using System;
 using System.Linq;
@@ -11,12 +12,12 @@ using System.Threading;
 namespace FlitBit.IoC.Constructors
 {
 	/// <summary>
-	/// Gets a contructor set for a type.
+	///   Gets a contructor set for a type.
 	/// </summary>
 	/// <typeparam name="T">target type T</typeparam>
-	/// <typeparam name="C">concrete type C</typeparam>
-	public sealed class ConstructorSet<T, C>
-		where C : class, T
+	/// <typeparam name="TConcrete">concrete type C</typeparam>
+	public sealed class ConstructorSet<T, TConcrete>
+		where TConcrete : class, T
 	{
 		readonly Lazy<ConstructorCommand<T>[]> _constructors;
 
@@ -25,20 +26,21 @@ namespace FlitBit.IoC.Constructors
 		volatile ConstructorCommand<T> _mostRecent;
 
 		/// <summary>
-		/// Creates a new instance.
+		///   Creates a new instance.
 		/// </summary>
 		/// <param name="parameters"></param>
 		public ConstructorSet(Param[] parameters)
 		{
 			_parameters = parameters;
-			_constructors = new Lazy<ConstructorCommand<T>[]>(BuildConstructorCommands, LazyThreadSafetyMode.ExecutionAndPublication);
+			_constructors = new Lazy<ConstructorCommand<T>[]>(BuildConstructorCommands,
+																												LazyThreadSafetyMode.ExecutionAndPublication);
 		}
 
 		internal bool TryMatchAndBind(Param[] parameters, out CommandBinding<T> command)
 		{
 			var constructors = _constructors.Value;
 
-			if ((parameters == null || parameters.Length == 0) && _default != null)
+			if (parameters == null || parameters.Length == 0 && _default != null)
 			{
 				return _default.TryMatchAndBind(Param.EmptyParams, out command);
 			}
@@ -52,7 +54,7 @@ namespace FlitBit.IoC.Constructors
 				}
 			}
 
-			var plen = (parameters != null) ? parameters.Length : 0;
+			var plen = parameters.Length;
 			if (plen > 0)
 			{
 				foreach (var c in constructors.Where(cc => cc.ParameterCount == plen))
@@ -67,7 +69,7 @@ namespace FlitBit.IoC.Constructors
 			else
 			{
 				var c = constructors.OrderByDescending(ci => ci.ParameterCount).FirstOrDefault();
-				if (c.TryMatchAndBind(Param.EmptyParams, out command))
+				if (c != null && c.TryMatchAndBind(Param.EmptyParams, out command))
 				{
 					return true;
 				}
@@ -79,15 +81,12 @@ namespace FlitBit.IoC.Constructors
 		ConstructorCommand<T>[] BuildConstructorCommands()
 		{
 			var ord = 0;
-			var result = (from c in typeof(C).GetConstructors(BindingFlags.Instance | BindingFlags.Public)
-						  let parms = c.GetParameters()
-						  orderby parms.Count()
-						  select new ConstructorCommand<T, C>(c, _parameters, ord++)).ToArray<ConstructorCommand<T>>();
+			var result = (from c in typeof(TConcrete).GetConstructors(BindingFlags.Instance | BindingFlags.Public)
+										let parms = c.GetParameters()
+										orderby parms.Count()
+										select new ConstructorCommand<T, TConcrete>(c, _parameters, ord++)).ToArray<ConstructorCommand<T>>();
 
-			_default = result.FirstOrDefault(c => c.BoundToSuppliedDefaults);
-			if (_default == null)
-				_default = result.FirstOrDefault(c => c.ParameterCount == 0);
-
+			_default = result.FirstOrDefault(c => c.BoundToSuppliedDefaults) ?? result.FirstOrDefault(c => c.ParameterCount == 0);
 			return result;
 		}
 	}

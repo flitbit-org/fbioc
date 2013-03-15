@@ -1,5 +1,7 @@
 ﻿#region COPYRIGHT© 2009-2013 Phillip Clark. All rights reserved.
+
 // For licensing information see License.txt (MIT style licensing).
+
 #endregion
 
 using System;
@@ -8,101 +10,18 @@ using FlitBit.Core;
 
 namespace FlitBit.IoC.Registry
 {
-	internal sealed class ContainerRegistry : ContainerOwned,  IContainerRegistry
+	internal sealed class ContainerRegistry : ContainerOwned, IContainerRegistry
 	{
-		ConcurrentDictionary<Type, ITypeRegistry> _registrations = new ConcurrentDictionary<Type, ITypeRegistry>();
+		readonly ConcurrentDictionary<Type, ITypeRegistry> _registrations = new ConcurrentDictionary<Type, ITypeRegistry>();
 
 		internal ContainerRegistry(IContainer container)
-			: base(container)
-		{
-		}
+			: base(container) { }
 
 		internal ContainerRegistry(IContainer container, IContainerRegistry baseRegistry)
-			: base(container)
-		{
-			BaseRegistry = baseRegistry;
-		}
+			: base(container) { BaseRegistry = baseRegistry; }
 
 		IContainerRegistry BaseRegistry { get; set; }
 
-		public ITypeRegistry<T> ForType<T>()
-		{
-			return AddOrGetTypeRegistry(typeof(T), c => new TypeRegistry<T>(c));
-		}
-
-		public IGenericTypeRegistry ForGenericType(Type generic)
-		{
-			if (generic == null) throw new ArgumentNullException("generic");
-			if (!generic.IsGenericTypeDefinition) throw new ArgumentException(String.Concat("Expected a generic type definition, received: ", generic.GetReadableFullName()), "generic");
-			
-			return AddOrGetTypeRegistry(generic, c => new GenericTypeRegistry(c, generic));
-		}
-
-		public bool IsTypeRegistered<T>()
-		{
-			return _registrations.ContainsKey(typeof(T))
-				|| (BaseRegistry != null && BaseRegistry.IsTypeRegistered(typeof(T)));
-		}
-
-		public bool IsTypeRegistered(Type type)
-		{
-			if (type == null) throw new ArgumentNullException("type");
-			return _registrations.ContainsKey(type)
-				|| (BaseRegistry != null && BaseRegistry.IsTypeRegistered(type));			
-		}
-
-		public bool TryGetResolverForType(Type type, out IResolver value)
-		{
-			if (type == null) throw new ArgumentNullException("type");
-
-			ITypeRegistry temp;
-			bool gotItHere = _registrations.TryGetValue(type, out temp);
-			if (gotItHere)
-			{
-				value = temp.UntypedResolver;
-				return true;
-			}
-			else if (BaseRegistry != null)
-			{
-				return BaseRegistry.TryGetResolverForType(type, out value);
-			}
-			value = null;
-			return false;
-		}
-
-		public bool TryGetResolverForType<T>(out IResolver<T> value)
-		{
-			ITypeRegistry temp;
-			bool gotItHere = _registrations.TryGetValue(typeof(T), out temp);
-			if (gotItHere)
-			{
-				value = ((ITypeRegistry<T>)temp).Resolver;
-				return true;
-			}
-			else if (BaseRegistry != null)
-			{
-				return BaseRegistry.TryGetResolverForType(out value);
-			}
-			value = null;
-			return false;
-		}
-
-		public bool TryGetNamedResolverForType<T>(string name, out IResolver<T> value)
-		{
-			ITypeRegistry r;
-			bool gotItHere = _registrations.TryGetValue(typeof(T), out r);
-			if (gotItHere)
-			{
-				return ((ITypeRegistry<T>)r).TryGetNamedResolver(name, out value);
-			}
-			else if (BaseRegistry != null)
-			{
-				return BaseRegistry.TryGetNamedResolverForType(name, out value);
-			}
-			value = null;
-			return false;
-		}
-				
 		protected override bool PerformDispose(bool disposing)
 		{
 			if (disposing)
@@ -118,9 +37,9 @@ namespace FlitBit.IoC.Registry
 		}
 
 		TTypeRegistry AddOrGetTypeRegistry<TTypeRegistry>(Type type, Func<IContainer, TTypeRegistry> factory)
-			where TTypeRegistry: ITypeRegistry
+			where TTypeRegistry : ITypeRegistry
 		{
-			ITypeRegistry r = null;
+			ITypeRegistry r;
 			do
 			{
 				ITypeRegistry value;
@@ -145,27 +64,118 @@ namespace FlitBit.IoC.Registry
 						Util.Dispose(ref r);
 					}
 				}
-			}
-			while (r == null);
+			} while (r == null);
 
-			return (TTypeRegistry)r;
+			return (TTypeRegistry) r;
+		}
+
+		#region IContainerRegistry Members
+
+		public ITypeRegistry<T> ForType<T>() { return AddOrGetTypeRegistry(typeof(T), c => new TypeRegistry<T>(c)); }
+
+		public IGenericTypeRegistry ForGenericType(Type generic)
+		{
+			if (generic == null)
+			{
+				throw new ArgumentNullException("generic");
+			}
+			if (!generic.IsGenericTypeDefinition)
+			{
+				throw new ArgumentException(
+					String.Concat("Expected a generic type definition, received: ", generic.GetReadableFullName()), "generic");
+			}
+
+			return AddOrGetTypeRegistry(generic, c => new GenericTypeRegistry(c, generic));
+		}
+
+		public bool IsTypeRegistered<T>()
+		{
+			return _registrations.ContainsKey(typeof(T))
+				|| (BaseRegistry != null && BaseRegistry.IsTypeRegistered(typeof(T)));
+		}
+
+		public bool IsTypeRegistered(Type type)
+		{
+			if (type == null)
+			{
+				throw new ArgumentNullException("type");
+			}
+			return _registrations.ContainsKey(type)
+				|| (BaseRegistry != null && BaseRegistry.IsTypeRegistered(type));
+		}
+
+		public bool TryGetResolverForType(Type type, out IResolver value)
+		{
+			if (type == null)
+			{
+				throw new ArgumentNullException("type");
+			}
+
+			ITypeRegistry temp;
+			var gotItHere = _registrations.TryGetValue(type, out temp);
+			if (gotItHere)
+			{
+				value = temp.UntypedResolver;
+				return true;
+			}
+			if (this.BaseRegistry != null)
+			{
+				return this.BaseRegistry.TryGetResolverForType(type, out value);
+			}
+			value = null;
+			return false;
+		}
+
+		public bool TryGetResolverForType<T>(out IResolver<T> value)
+		{
+			ITypeRegistry temp;
+			var gotItHere = _registrations.TryGetValue(typeof(T), out temp);
+			if (gotItHere)
+			{
+				value = ((ITypeRegistry<T>) temp).Resolver;
+				return true;
+			}
+			if (this.BaseRegistry != null)
+			{
+				return this.BaseRegistry.TryGetResolverForType(out value);
+			}
+			value = null;
+			return false;
+		}
+
+		public bool TryGetNamedResolverForType<T>(string name, out IResolver<T> value)
+		{
+			ITypeRegistry r;
+			var gotItHere = _registrations.TryGetValue(typeof(T), out r);
+			if (gotItHere)
+			{
+				return ((ITypeRegistry<T>) r).TryGetNamedResolver(name, out value);
+			}
+			if (this.BaseRegistry != null)
+			{
+				return this.BaseRegistry.TryGetNamedResolverForType(name, out value);
+			}
+			value = null;
+			return false;
 		}
 
 		public bool TryGetTypeRegistryManagement(Type type, out ITypeRegistryManagement value)
 		{
 			ITypeRegistry temp;
-			bool gotItHere = _registrations.TryGetValue(type, out temp);
+			var gotItHere = _registrations.TryGetValue(type, out temp);
 			if (gotItHere)
 			{
 				value = temp as ITypeRegistryManagement;
 				return value != null;
 			}
-			else if (BaseRegistry != null)
+			if (this.BaseRegistry != null)
 			{
-				return BaseRegistry.TryGetTypeRegistryManagement(type, out value);
+				return this.BaseRegistry.TryGetTypeRegistryManagement(type, out value);
 			}
 			value = null;
 			return false;
 		}
+
+		#endregion
 	}
 }

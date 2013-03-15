@@ -1,5 +1,7 @@
 ﻿#region COPYRIGHT© 2009-2013 Phillip Clark. All rights reserved.
+
 // For licensing information see License.txt (MIT style licensing).
+
 #endregion
 
 using System;
@@ -8,39 +10,36 @@ using FlitBit.IoC.Constructors;
 
 namespace FlitBit.IoC.Registry
 {
-	internal class TypeRegistration<T, C> : TypeRegistration<T>
-		where C : class, T
+	internal class TypeRegistration<T, TConcrete> : TypeRegistration<T>
+		where TConcrete : class, T
 	{
-		readonly ConstructorSet<T, C> _constructors;
+		readonly ConstructorSet<T, TConcrete> _constructors;
 		readonly Lazy<IResolver<T>> _resolver;
 
 		public TypeRegistration(IContainer container)
-			: this(container, null)
-		{
-		}
+			: this(container, null) { }
+
 		public TypeRegistration(IContainer container, Param[] parameters)
 			: base(container)
 		{
-			_constructors = new ConstructorSet<T, C>(parameters);
+			_constructors = new ConstructorSet<T, TConcrete>(parameters);
 			_resolver = new Lazy<IResolver<T>>(ConfigureResolver, LazyThreadSafetyMode.ExecutionAndPublication);
 		}
 
-		public override IResolver UntypedResolver { get { return _resolver.Value; } }
-		public override IResolver<T> Resolver { get { return _resolver.Value; } }
-		
-		protected override IResolver<T> ConstructPerRequestResolver()
+		public override IResolver<T> Resolver
 		{
-			return new Resolver<T, C>(_constructors);			
+			get { return _resolver.Value; }
 		}
 
-		protected override IResolver<T> ConstructPerScopeResolver()
+		public override IResolver UntypedResolver
 		{
-			return new InstancePerScopeResolver<T, C>(_constructors);
+			get { return _resolver.Value; }
 		}
 
-		protected override IResolver<T> ConstructSingletonResolver()
-		{
-			return new SingletonResolver<T, C>(Container, _constructors);
-		}
+		protected override IResolver<T> ConstructPerRequestResolver() { return new Resolver<T, TConcrete>(_constructors); }
+
+		protected override IResolver<T> ConstructPerScopeResolver() { return new InstancePerScopeResolver<T, TConcrete>(_constructors); }
+
+		protected override IResolver<T> ConstructSingletonResolver() { return new SingletonResolver<T, TConcrete>(Container, _constructors); }
 	}
 }

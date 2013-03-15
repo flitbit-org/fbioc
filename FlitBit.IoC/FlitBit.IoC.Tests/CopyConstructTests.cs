@@ -7,30 +7,10 @@ namespace FlitBit.IoC.Tests
 	[TestClass]
 	public class CopyConstructTests
 	{
-		public class A
-		{
-			public string Name { get; set; }
-			public DateTime When { get; set; }
-		}
-
-		public class B : A
-		{
-			static int __count = 0;
-			public B()
-			{
-				this.InstanceCount = Interlocked.Increment(ref __count);
-			}
-			public int InstanceCount { get; set; }
-		}
-
-		public class C : B
-		{	
-		}
-
 		[TestMethod]
 		public void Container_CanCopyConstructA2A()
 		{
-			Random rand = new Random();
+			var rand = new Random();
 
 			using (var container = Create.NewContainer())
 			{
@@ -42,7 +22,7 @@ namespace FlitBit.IoC.Tests
 				var aa = container.New<A>();
 				Assert.IsNotNull(aa);
 				Assert.AreNotSame(a, aa);
-				
+
 				// No type inference...
 				var aaa = container.NewCopy<A, A>(a);
 				Assert.IsNotNull(aaa);
@@ -55,14 +35,14 @@ namespace FlitBit.IoC.Tests
 				Assert.IsNotNull(aaa);
 				Assert.AreNotSame(a, aaa);
 				Assert.AreEqual(a.Name, aaa.Name);
-				Assert.AreEqual(a.When, aaa.When); 
+				Assert.AreEqual(a.When, aaa.When);
 			}
 		}
 
 		[TestMethod]
 		public void Container_CanCopyConstructB2AandB2C()
 		{
-			Random rand = new Random();
+			var rand = new Random();
 
 			using (var container = Create.NewContainer())
 			{
@@ -89,5 +69,21 @@ namespace FlitBit.IoC.Tests
 				Assert.AreEqual(b.InstanceCount, c.InstanceCount);
 			}
 		}
+
+		public class A
+		{
+			public string Name { get; set; }
+			public DateTime When { get; set; }
+		}
+
+		public class B : A
+		{
+			static int __count;
+			public B() { this.InstanceCount = Interlocked.Increment(ref __count); }
+			public int InstanceCount { get; set; }
+		}
+
+		public class C : B
+		{}
 	}
 }

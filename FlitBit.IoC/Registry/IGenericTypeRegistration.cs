@@ -1,16 +1,18 @@
 ﻿#region COPYRIGHT© 2009-2013 Phillip Clark. All rights reserved.
+
 // For licensing information see License.txt (MIT style licensing).
+
 #endregion
 
 namespace FlitBit.IoC.Registry
 {
 	/// <summary>
-	/// Registration for a generic type.
+	///   Registration for a generic type.
 	/// </summary>
 	public interface IGenericTypeRegistration : ITypeRegistration
 	{
 		/// <summary>
-		/// Gets a resolver for type T
+		///   Gets a resolver for type T
 		/// </summary>
 		/// <typeparam name="T">type T</typeparam>
 		/// <returns>the resolver for type T</returns>

@@ -1,5 +1,7 @@
 ﻿#region COPYRIGHT© 2009-2013 Phillip Clark. All rights reserved.
+
 // For licensing information see License.txt (MIT style licensing).
+
 #endregion
 
 using System;
@@ -9,14 +11,14 @@ using FlitBit.Core;
 using FlitBit.Emit;
 
 namespace FlitBit.IoC.Constructors
-{	
+{
 	/// <summary>
-	/// Adapter for constructors defined on type T
+	///   Adapter for constructors defined on type T
 	/// </summary>
 	public partial class ConstructorAdapter<T>
-	{		
+	{
 		/// <summary>
-		/// Compiles a constructor adapter for the given constructor.
+		///   Compiles a constructor adapter for the given constructor.
 		/// </summary>
 		/// <param name="ordinal">the ordinal position of the constructor among constructors defined on type T</param>
 		/// <param name="ci">constructor info</param>
@@ -30,14 +32,10 @@ namespace FlitBit.IoC.Constructors
 			lock (lck)
 			{
 				var targetType = typeof(T);
-				string typeName = RuntimeAssemblies.PrepareTypeName(targetType, String.Concat("Ctor#", ordinal));
+				var typeName = RuntimeAssemblies.PrepareTypeName(targetType, String.Concat("Ctor#", ordinal));
 
 				var module = ConstructorAdapter.Module;
-				Type type = module.Builder.GetType(typeName, false, false);
-				if (type == null)
-				{
-					type = BuildConstructorAdapter(module, typeName, ci);
-				}
+				var type = module.Builder.GetType(typeName, false, false) ?? BuildConstructorAdapter(module, typeName, ci);
 				return type;
 			}
 		}
@@ -74,7 +72,7 @@ namespace FlitBit.IoC.Constructors
 					}
 				}
 				il.NewObj(ci);
-				il.StoreLocal(result);				
+				il.StoreLocal(result);
 				var br = il.DefineLabel();
 				il.Branch(br);
 				il.MarkLabel(br);

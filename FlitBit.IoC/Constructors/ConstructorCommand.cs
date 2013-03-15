@@ -1,5 +1,7 @@
 ﻿#region COPYRIGHT© 2009-2013 Phillip Clark. All rights reserved.
+
 // For licensing information see License.txt (MIT style licensing).
+
 #endregion
 
 using System;
@@ -10,23 +12,24 @@ using System.Threading;
 namespace FlitBit.IoC.Constructors
 {
 	/// <summary>
-	/// Base constructor command; matches incomming parameters to the most suitable
-	/// constructor declared on the target type.
+	///   Base constructor command; matches incomming parameters to the most suitable
+	///   constructor declared on the target type.
 	/// </summary>
 	/// <typeparam name="T">target type T</typeparam>
 	public abstract class ConstructorCommand<T>
 	{
 		/// <summary>
-		/// Gets the parameter count.
-		/// </summary>
-		public abstract int ParameterCount { get; }
-		/// <summary>
-		/// Indicates whether the command is bound to supplied defaults.
+		///   Indicates whether the command is bound to supplied defaults.
 		/// </summary>
 		public abstract bool BoundToSuppliedDefaults { get; }
 
 		/// <summary>
-		/// Tries to match supplied params to a constructor and provides a command binding.
+		///   Gets the parameter count.
+		/// </summary>
+		public abstract int ParameterCount { get; }
+
+		/// <summary>
+		///   Tries to match supplied params to a constructor and provides a command binding.
 		/// </summary>
 		/// <param name="parameters">the supplied parameters</param>
 		/// <param name="binding">variable to hold the binding upon success</param>
@@ -35,22 +38,22 @@ namespace FlitBit.IoC.Constructors
 	}
 
 	/// <summary>
-	/// Default implementation of the constructor command type.
+	///   Default implementation of the constructor command type.
 	/// </summary>
 	/// <typeparam name="T">target type T</typeparam>
-	/// <typeparam name="C">concrete type C</typeparam>
-	public sealed class ConstructorCommand<T, C>: ConstructorCommand<T>
-		where C: class, T
+	/// <typeparam name="TConcrete">concrete type C</typeparam>
+	public sealed class ConstructorCommand<T, TConcrete> : ConstructorCommand<T>
+		where TConcrete : class, T
 	{
-		readonly int _ordinal;
-		readonly ConstructorInfo _ctor;
-		readonly Param[] _params;
-		readonly bool _bound;
-		readonly bool _isMissingParameters;
 		readonly Lazy<ConstructorAdapter<T>> _adapter;
+		readonly bool _bound;
+		readonly ConstructorInfo _ctor;
+		readonly bool _isMissingParameters;
+		readonly int _ordinal;
+		readonly Param[] _params;
 
 		/// <summary>
-		/// Creates a new instance.
+		///   Creates a new instance.
 		/// </summary>
 		/// <param name="ci">reflected constructor info</param>
 		/// <param name="defaults">default params supplied during registration</param>
@@ -59,7 +62,6 @@ namespace FlitBit.IoC.Constructors
 		{
 			_ctor = ci;
 			_ordinal = ordinal;
-			var defined = ci.GetParameters();
 			_bound = Param.TryBindSuppliedDefaults(_ctor, defaults, out _params);
 			if (!this.BoundToSuppliedDefaults)
 			{
@@ -70,17 +72,23 @@ namespace FlitBit.IoC.Constructors
 		}
 
 		/// <summary>
-		/// Gets the parameter count.
+		///   Indicates whether the command is bound to supplied defaults.
 		/// </summary>
-		public override int ParameterCount { get { return _params.Length; } }
+		public override bool BoundToSuppliedDefaults
+		{
+			get { return _bound; }
+		}
 
 		/// <summary>
-		/// Indicates whether the command is bound to supplied defaults.
+		///   Gets the parameter count.
 		/// </summary>
-		public override bool BoundToSuppliedDefaults { get { return _bound; } }
+		public override int ParameterCount
+		{
+			get { return _params.Length; }
+		}
 
 		/// <summary>
-		/// Tries to match supplied params to a constructor and provides a command binding.
+		///   Tries to match supplied params to a constructor and provides a command binding.
 		/// </summary>
 		/// <param name="parameters">the supplied parameters</param>
 		/// <param name="binding">variable to hold the binding upon success</param>
@@ -93,12 +101,12 @@ namespace FlitBit.IoC.Constructors
 				binding = CommandBinding<T>.Create(_adapter.Value, _params);
 				return true;
 			}
-			else if (_params.Length == plen)
+			if (this._params.Length == plen)
 			{
 				var result = new Param[plen];
-				for (int i = 0; i < plen; i = i + 1)
+				for (var i = 0; i < plen; i = i + 1)
 				{
-					result[i] = (parameters[i].Kind == ParamKind.ContainerSupplied) ? _params[i] : parameters[i];
+					result[i] = (parameters[i].Kind == ParamKind.ContainerSupplied) ? this._params[i] : parameters[i];
 
 					if (result[i].Kind == ParamKind.Missing)
 					{
@@ -106,7 +114,7 @@ namespace FlitBit.IoC.Constructors
 						return false;
 					}
 				}
-				binding = CommandBinding<T>.Create(_adapter.Value, result);
+				binding = CommandBinding<T>.Create(this._adapter.Value, result);
 				return true;
 			}
 
@@ -116,9 +124,8 @@ namespace FlitBit.IoC.Constructors
 
 		ConstructorAdapter<T> ActivateConstructorAdapter()
 		{
-			Type typ = ConstructorAdapter<T, C>.GetConstructorAdapterByOrdinal(_ordinal, _ctor);
-			return (ConstructorAdapter<T>)Activator.CreateInstance(typ);
+			var typ = ConstructorAdapter<T, TConcrete>.GetConstructorAdapterByOrdinal(_ordinal, _ctor);
+			return (ConstructorAdapter<T>) Activator.CreateInstance(typ);
 		}
-
 	}
 }

@@ -1,5 +1,7 @@
 ﻿#region COPYRIGHT© 2009-2012 Phillip Clark. All rights reserved.
+
 // For licensing information see License.txt (MIT style licensing).
+
 #endregion
 
 using System;
@@ -13,30 +15,34 @@ namespace FlitBit.IoC.Tests
 		public A() { Name = this.GetType().Name; }
 		public string Name { get; protected set; }
 	}
-	public class B : A { }
-	public class C : A { internal C() : base() { } }
+
+	public class B : A
+	{}
+
+	public class C : A
+	{
+		internal C() { }
+	}
+
 	public class D : C, IDisposable
 	{
-		public D() : base() { }
+		~D() { Dispose(false); }
 		public bool IsDisposed { get; private set; }
 
-		~D() { Dispose(false); }
-		public void Dispose()
-		{
-			Dispose(true);
-		}
-		private void Dispose(bool disposing)
-		{
-			IsDisposed = disposing;
-		}
+		void Dispose(bool disposing) { IsDisposed = disposing; }
+
+		#region IDisposable Members
+
+		public void Dispose() { Dispose(true); }
+
+		#endregion
 	}
+
 	public class E : D
 	{
-		public E(string name)
-		{
-			Name = name;
-		}
+		public E(string name) { Name = name; }
 	}
+
 	public class F : A
 	{
 		public F(double aDouble, object anObject, A anA)
@@ -54,115 +60,96 @@ namespace FlitBit.IoC.Tests
 			AnA = anA;
 		}
 
-		public int AnInt { get; private set; }
 		public double ADouble { get; private set; }
-		public object AnObject { get; private set; }
 		public A AnA { get; private set; }
+		public int AnInt { get; private set; }
+		public object AnObject { get; private set; }
 	}
 
 	public interface I
 	{
 		string Name { get; }
 	}
+
 	public class J : I
 	{
 		public J() { Name = this.GetType().Name; }
+
+		#region I Members
+
 		public string Name { get; protected set; }
+
+		#endregion
 	}
+
 	public class K : J
-	{
-	}
+	{}
 
 	public interface L
 	{
 		string Name { get; }
 	}
+
 	public class M : L
 	{
 		public M() { Name = this.GetType().Name; }
+
+		#region L Members
+
 		public string Name { get; protected set; }
+
+		#endregion
 	}
 
 	public class N
 	{
-		public int Ordinal { get; set; }
 		public string Name { get; set; }
+		public int Ordinal { get; set; }
 	}
 
 	public class O : L
 	{
-		public string Name { get; set; }
-
-		public A AnA { get; set; }
-
 		public O(string name, A anA)
 		{
 			Name = name;
 			AnA = anA;
 		}
+
+		public A AnA { get; set; }
+
+		#region L Members
+
+		public string Name { get; set; }
+
+		#endregion
 	}
 
 	public class TenantResolver : ITenantResolver
 	{
-		internal static void PushTenantID(string id)
-		{
-			_tenantID = id;
-		}
-		static string _tenantID = "flip";
+		static string __tenantID = "flip";
+
+		#region ITenantResolver Members
+
 		public bool TryResolveTenant(out object handback)
 		{
-			handback = _tenantID;
+			handback = __tenantID;
 			return true;
 		}
+
+		#endregion
+
+		internal static void PushTenantID(string id) { __tenantID = id; }
 	}
 
 	[TestClass]
 	public partial class ContainerTests
 	{
-		[TestInitialize]
-		public void Init()
-		{
-		}
-
-		[TestMethod]
-		public void ContainerAlwaysResolvesToItself()
-		{
-			var root = Container.Root;
-			var c = root.New<IContainer>();
-			Assert.AreEqual(root, c);
-
-			using (var scope = Create.NewContainer())
-			{
-				var cc = scope.New<IContainer>();
-				Assert.AreEqual(scope, cc);
-			}
-		}
-
-		[TestMethod]
-		public void SimpleContainer()
-		{
-			var root = Container.Root;
-			root.ForType<A>()
-				.Register<B>()
-				.End();
-
-			using (var c = Create.NewContainer())
-			{
-				Assert.IsNotNull(c);
-
-				var b = c.New<A>();
-				Assert.IsInstanceOfType(b, typeof(A));
-				Assert.IsInstanceOfType(b, typeof(B));
-				Assert.AreEqual("B", b.Name);
-			}
-		}
-
 		[TestMethod]
 		public void CanInitializeDuringCreate()
 		{
 			var root = Container.Root;
 
-			int counter = 0;
+			var counter = 0;
 			root.Subscribe<N>((type, instance, name, kind) =>
 			{
 				Assert.AreEqual(typeof(N), type);
@@ -200,81 +187,12 @@ namespace FlitBit.IoC.Tests
 		}
 
 		[TestMethod]
-		public void MultiTenantContainerCanSpecialize()
-		{
-			Container.Root
-				.ForType<A>()
-					.Register<B>()
-					.End();
-
-			if (!Container.Root.SupportsMultipleTenants)
-			{
-				Container.Root
-				.RegisterMultiTenant<TenantResolver>()
-					.End();
-				Container.Root
-					.RegisterTenant("flip")
-						.ForType<A>()
-							.Register((c, p) => new C())
-							.End();
-				Container.Root
-					.RegisterTenant("flop")
-						.ForType<A>()
-							.Register((c, p) => new D())
-							.End();
-			}
-
-			TenantResolver.PushTenantID("flip");
-			using (var flip = Create.TenantContainer())
-			using (var child_of_flip = Create.NewContainer())
-			{
-				Assert.IsFalse(flip.IsRoot, "must not be a root container");
-				Assert.IsTrue(flip.IsTenant, "must be a tenant");
-
-				Assert.IsFalse(child_of_flip.IsRoot, "child of flip must not be a root container");
-				Assert.IsTrue(child_of_flip.IsTenant, "child of flip must not be a tenant");
-
-				Assert.AreNotEqual(flip, child_of_flip, "flip and its child must not be the same container");
-				Assert.AreEqual(flip.TenantID, child_of_flip.TenantID, "flip and its child must identify with the same tenant");
-
-				// Child of tenant "flip" resolves A to C
-				var c = child_of_flip.New<A>();
-				Assert.IsInstanceOfType(c, typeof(A), "child scope should resolve type A");
-				Assert.IsInstanceOfType(c, typeof(C), "child scope should resolve type A to type C");
-				Assert.AreEqual("C", c.Name, "valid type C knows its name");
-
-				// Root continues to resolve A to B
-				var b = Container.Root.New<A>();
-				Assert.AreNotEqual(c, b);
-				Assert.IsInstanceOfType(b, typeof(A));
-				Assert.IsInstanceOfType(b, typeof(B));
-				Assert.AreEqual("B", b.Name);
-
-				// Tenants don't conflict...
-				TenantResolver.PushTenantID("flop");
-				using (var flop = Create.TenantContainer())
-				{
-					Assert.IsFalse(flop.IsRoot);
-					Assert.IsTrue(flop.IsTenant);
-					Assert.AreEqual("flop", flop.TenantID);
-
-					// Tenant "flop" resolves A to D
-					var d = flop.New<A>();
-					Assert.IsInstanceOfType(d, typeof(A));
-					Assert.IsInstanceOfType(d, typeof(D));
-					Assert.AreEqual("D", d.Name);
-				}
-			}
-
-		}
-
-		[TestMethod]
 		public void ChildContainerCanSpecialize()
 		{
 			Container.Root
-				.ForType<A>()
-					.Register<B>()
-					.End();
+							.ForType<A>()
+							.Register<B>()
+							.End();
 
 			using (var scope = Create.NewContainer())
 			{
@@ -282,8 +200,8 @@ namespace FlitBit.IoC.Tests
 				Assert.IsFalse(scope.IsTenant);
 
 				scope.ForType<A>()
-					.Register((c, p) => new C())
-					.End();
+						.Register((c, p) => new C())
+						.End();
 
 				Assert.IsNotNull(scope);
 
@@ -308,31 +226,183 @@ namespace FlitBit.IoC.Tests
 		}
 
 		[TestMethod]
-		public void CreationObserversAreCalledDuringCreate()
+		public void ContainerAlwaysResolvesToItself()
 		{
-			Container.Root
-				.ForType<A>()
-					.Register<B>()
-					.End();
+			var root = Container.Root;
+			var c = root.New<IContainer>();
+			Assert.AreEqual(root, c);
 
-			var creations = 0;
+			using (var scope = Create.NewContainer())
+			{
+				var cc = scope.New<IContainer>();
+				Assert.AreEqual(scope, cc);
+			}
+		}
+
+		[TestMethod]
+		public void ContainerCanCreateInstanceAndMatchAmongMultipleConstructors()
+		{
+			var args = new
+			{
+				AnInt = 1967,
+				ADouble = 3.14,
+				AnObject = new Object(),
+				AnA = new A(),
+			};
+
+			using (var scope = Create.NewContainer())
+			{
+				var f = scope
+					.NewWithParams<F>(
+													 Param.FromValue(args.ADouble),
+													Param.Resolve<object>(),
+													Param.Resolve<A>());
+
+				Assert.IsNotNull(f);
+				Assert.AreNotEqual(args.AnInt, f.AnInt);
+
+				// The arguments supplied to the container came back in the instance...
+				Assert.AreEqual(args.ADouble, f.ADouble);
+
+				// The container created new instances of these...
+				Assert.AreNotEqual(args.AnObject, f.AnObject);
+				Assert.AreNotEqual(args.AnA, f.AnA);
+
+				var ff = scope.NewWithParams<F>(
+																			 Param.FromValue(args.AnInt),
+																			Param.FromValue(args.ADouble),
+																			Param.FromValue(args.AnObject),
+																			Param.FromValue(args.AnA)
+					);
+
+				Assert.IsNotNull(ff);
+				Assert.AreNotEqual(f, ff);
+
+				// The arguments supplied to the container came back in the instance...				
+				Assert.AreEqual(args.AnInt, ff.AnInt);
+				Assert.AreEqual(args.ADouble, ff.ADouble);
+				Assert.AreEqual(args.AnObject, ff.AnObject);
+				Assert.AreEqual(args.AnA, ff.AnA);
+			}
+		}
+
+		[TestMethod]
+		public void ContainerCanCreateInstanceWithConstructorParameterSetSuppliedDuringResolve()
+		{
+			var args = new
+			{
+				AnInt = 1967,
+				ADouble = 3.14,
+				AnObject = new Object(),
+				AnA = Create.New<A>(),
+			};
+
 			using (var scope = Create.NewContainer())
 			{
 				Assert.IsFalse(scope.IsRoot);
 				Assert.IsFalse(scope.IsTenant);
 
-				scope.Subscribe<A>((t, item, name, kind) =>
-				{
-					Assert.IsInstanceOfType(item, typeof(A));
-					Assert.IsInstanceOfType(item, typeof(B));
-					creations++;
-				});
+				var f = scope.NewWithParams<F>(
+																			 Param.FromValue(args.AnInt),
+																			Param.FromValue(args.ADouble),
+																			Param.FromValue(args.AnObject),
+																			Param.FromValue(args.AnA));
+
+				Assert.IsNotNull(f);
+				Assert.AreEqual(args.AnInt, f.AnInt);
+				Assert.AreEqual(args.ADouble, f.ADouble);
+				Assert.AreEqual(args.AnObject, f.AnObject);
+				Assert.AreEqual(args.AnA, f.AnA);
+			}
+		}
+
+		[TestMethod]
+		public void ContainerCanLazyRegisterAndResolveTypes()
+		{
+			Container.Root
+							.ForType<A>()
+							.LazyRegister((t) =>
+							{
+								Assert.AreSame(typeof(A), t);
+								return typeof(D);
+							})
+							.End();
+
+			D d;
+			using (var scope = Create.NewContainer())
+			{
+				Assert.IsNotNull(scope);
+				Assert.IsFalse(scope.IsRoot);
+				Assert.IsFalse(scope.IsTenant);
+
+				d = scope.New<A>() as D;
+				Assert.IsInstanceOfType(d, typeof(A));
+				Assert.IsInstanceOfType(d, typeof(D));
+				Assert.AreEqual("D", d.Name);
+				Assert.IsFalse(d.IsDisposed);
+			}
+			Assert.IsTrue(d.IsDisposed);
+		}
+
+		[TestMethod]
+		public void ContainerCanResolveNamedTypesOfT()
+		{
+			Container.Root
+							.ForType<A>()
+							.Register<B>()
+							.End();
+
+			using (var scope = Create.NewContainer())
+			{
+				scope
+					.ForType<A>().RegisterWithName("CC", (c, p) => new C()).End()
+					.ForType<A>().RegisterWithName<D>("DD").End()
+					;
 
 				var b = scope.New<A>();
 				Assert.IsInstanceOfType(b, typeof(A));
 				Assert.IsInstanceOfType(b, typeof(B));
 				Assert.AreEqual("B", b.Name);
-				Assert.AreEqual(1, creations, "should have observed one creation event");
+
+				var cc = scope.NewNamed<A>("CC");
+				Assert.IsInstanceOfType(cc, typeof(A));
+				Assert.IsInstanceOfType(cc, typeof(C));
+				Assert.AreEqual("C", cc.Name);
+
+				var d = scope.NewNamed<A>("DD");
+				Assert.IsInstanceOfType(d, typeof(A));
+				Assert.IsInstanceOfType(d, typeof(D));
+				Assert.AreEqual("D", d.Name);
+			}
+		}
+
+		[TestMethod]
+		public void ContainerRegisterTypesNotHavingDefaultConstructor()
+		{
+			using (var scope = Create.NewContainer())
+			{
+				Assert.IsFalse(scope.IsRoot);
+				Assert.IsFalse(scope.IsTenant);
+
+				scope.ForType<A>()
+						.Register<E>(Param.Named("name", "N"))
+						.End();
+
+				Assert.IsNotNull(scope);
+
+				var e = scope.New<A>();
+
+				Assert.IsInstanceOfType(e, typeof(A));
+				Assert.IsInstanceOfType(e, typeof(E));
+				Assert.AreEqual("N", e.Name);
+
+				// Even parameters supplied during type registration
+				// may be overriden at create time...
+				var ee = scope.NewWithParams<A>(Param.FromValue("M"));
+
+				Assert.IsInstanceOfType(ee, typeof(A));
+				Assert.IsInstanceOfType(ee, typeof(E));
+				Assert.AreEqual("M", ee.Name);
 			}
 		}
 
@@ -340,9 +410,9 @@ namespace FlitBit.IoC.Tests
 		public void CreationObserversApplyToScopes()
 		{
 			Container.Root
-				.ForType<A>()
-					.Register((c, p) => new C())
-					.End();
+							.ForType<A>()
+							.Register((c, p) => new C())
+							.End();
 
 			int creations = 0, innerCreations = 0;
 			using (var scope = Create.NewContainer())
@@ -396,32 +466,36 @@ namespace FlitBit.IoC.Tests
 		}
 
 		[TestMethod]
-		public void ContainerCanLazyRegisterAndResolveTypes()
+		public void CreationObserversAreCalledDuringCreate()
 		{
 			Container.Root
-				.ForType<A>()
-					.LazyRegister((t) =>
-					{
-						Assert.AreSame(typeof(A), t);
-						return typeof(D);
-					})
-					.End();
+							.ForType<A>()
+							.Register<B>()
+							.End();
 
-			D d;
+			var creations = 0;
 			using (var scope = Create.NewContainer())
 			{
-				Assert.IsNotNull(scope);
 				Assert.IsFalse(scope.IsRoot);
 				Assert.IsFalse(scope.IsTenant);
 
-				d = scope.New<A>() as D;
-				Assert.IsInstanceOfType(d, typeof(A));
-				Assert.IsInstanceOfType(d, typeof(D));
-				Assert.AreEqual("D", d.Name);
-				Assert.IsFalse(d.IsDisposed);
+				scope.Subscribe<A>((t, item, name, kind) =>
+				{
+					Assert.IsInstanceOfType(item, typeof(A));
+					Assert.IsInstanceOfType(item, typeof(B));
+					creations++;
+				});
+
+				var b = scope.New<A>();
+				Assert.IsInstanceOfType(b, typeof(A));
+				Assert.IsInstanceOfType(b, typeof(B));
+				Assert.AreEqual("B", b.Name);
+				Assert.AreEqual(1, creations, "should have observed one creation event");
 			}
-			Assert.IsTrue(d.IsDisposed);
 		}
+
+		[TestInitialize]
+		public void Init() { }
 
 		[TestMethod]
 		public void InstacesCreatedInGlobalScopeDontParticipateInCleanup()
@@ -450,151 +524,12 @@ namespace FlitBit.IoC.Tests
 		}
 
 		[TestMethod]
-		public void ContainerRegisterTypesNotHavingDefaultConstructor()
-		{
-			using (var scope = Create.NewContainer())
-			{
-				Assert.IsFalse(scope.IsRoot);
-				Assert.IsFalse(scope.IsTenant);
-
-				scope.ForType<A>()
-					.Register<E>(Param.Named("name", "N"))
-					.End();
-
-				Assert.IsNotNull(scope);
-
-				var e = scope.New<A>();
-
-				Assert.IsInstanceOfType(e, typeof(A));
-				Assert.IsInstanceOfType(e, typeof(E));
-				Assert.AreEqual("N", e.Name);
-
-				// Even parameters supplied during type registration
-				// may be overriden at create time...
-				var ee = scope.NewWithParams<A>(Param.Value("M"));
-
-				Assert.IsInstanceOfType(ee, typeof(A));
-				Assert.IsInstanceOfType(ee, typeof(E));
-				Assert.AreEqual("M", ee.Name);
-			}
-		}
-
-		[TestMethod]
-		public void ContainerCanCreateInstanceWithConstructorParameterSetSuppliedDuringResolve()
-		{
-			var args = new
-			{
-				AnInt = 1967,
-				ADouble = 3.14,
-				AnObject = new Object(),
-				AnA = Create.New<A>(),
-			};
-
-			using (var scope = Create.NewContainer())
-			{
-				Assert.IsFalse(scope.IsRoot);
-				Assert.IsFalse(scope.IsTenant);
-
-				F f = scope.NewWithParams<F>(
-						Param.Value(args.AnInt),
-						Param.Value(args.ADouble),
-						Param.Value(args.AnObject),
-						Param.Value(args.AnA));
-
-				Assert.IsNotNull(f);
-				Assert.AreEqual(args.AnInt, f.AnInt);
-				Assert.AreEqual(args.ADouble, f.ADouble);
-				Assert.AreEqual(args.AnObject, f.AnObject);
-				Assert.AreEqual(args.AnA, f.AnA);
-			}
-		}
-
-		[TestMethod]
-		public void ContainerCanCreateInstanceAndMatchAmongMultipleConstructors()
-		{
-			var args = new
-			{
-				AnInt = 1967,
-				ADouble = 3.14,
-				AnObject = new Object(),
-				AnA = new A(),
-			};
-
-			using (var scope = Create.NewContainer())
-			{
-				F f = scope
-					.NewWithParams<F>(
-						Param.Value(args.ADouble),
-						Param.Resolve<object>(),
-						Param.Resolve<A>());
-
-				Assert.IsNotNull(f);
-				Assert.AreNotEqual(args.AnInt, f.AnInt);
-
-				// The arguments supplied to the container came back in the instance...
-				Assert.AreEqual(args.ADouble, f.ADouble);
-
-				// The container created new instances of these...
-				Assert.AreNotEqual(args.AnObject, f.AnObject);
-				Assert.AreNotEqual(args.AnA, f.AnA);
-
-				F ff = scope.NewWithParams<F>(
-					Param.Value(args.AnInt),
-					Param.Value(args.ADouble),
-					Param.Value(args.AnObject),
-					Param.Value(args.AnA)
-					);
-
-				Assert.IsNotNull(ff);
-				Assert.AreNotEqual(f, ff);
-
-				// The arguments supplied to the container came back in the instance...				
-				Assert.AreEqual(args.AnInt, ff.AnInt);
-				Assert.AreEqual(args.ADouble, ff.ADouble);
-				Assert.AreEqual(args.AnObject, ff.AnObject);
-				Assert.AreEqual(args.AnA, ff.AnA);
-			}
-		}
-
-		[TestMethod]
-		public void ContainerCanResolveNamedTypesOfT()
-		{
-			Container.Root
-				.ForType<A>()
-					.Register<B>()
-					.End();
-
-			using (var scope = Create.NewContainer())
-			{
-				scope
-					.ForType<A>().RegisterWithName("CC", (c, p) => new C()).End()
-					.ForType<A>().RegisterWithName<D>("DD").End()
-					;
-
-				var b = scope.New<A>();
-				Assert.IsInstanceOfType(b, typeof(A));
-				Assert.IsInstanceOfType(b, typeof(B));
-				Assert.AreEqual("B", b.Name);
-
-				var cc = scope.NewNamed<A>("CC");
-				Assert.IsInstanceOfType(cc, typeof(A));
-				Assert.IsInstanceOfType(cc, typeof(C));
-				Assert.AreEqual("C", cc.Name);
-
-				var d = scope.NewNamed<A>("DD");
-				Assert.IsInstanceOfType(d, typeof(A));
-				Assert.IsInstanceOfType(d, typeof(D));
-				Assert.AreEqual("D", d.Name);
-			}
-		}
-
-		[TestMethod]
 		public void InstancePerScopeIsRespectedAmongScopes()
 		{
 			Container.Root
-				.ForType<A>()
-					.Register<B>().ResolveAnInstancePerScope()
-					.End();
+							.ForType<A>()
+							.Register<B>().ResolveAnInstancePerScope()
+							.End();
 
 			var outer = Container.Root.New<A>();
 			Assert.IsInstanceOfType(outer, typeof(A));
@@ -628,13 +563,83 @@ namespace FlitBit.IoC.Tests
 		}
 
 		[TestMethod]
+		public void MultiTenantContainerCanSpecialize()
+		{
+			Container.Root
+							.ForType<A>()
+							.Register<B>()
+							.End();
+
+			if (!Container.Root.SupportsMultipleTenants)
+			{
+				Container.Root
+								.RegisterMultiTenant<TenantResolver>()
+								.End();
+				Container.Root
+								.RegisterTenant("flip")
+								.ForType<A>()
+								.Register((c, p) => new C())
+								.End();
+				Container.Root
+								.RegisterTenant("flop")
+								.ForType<A>()
+								.Register((c, p) => new D())
+								.End();
+			}
+
+			TenantResolver.PushTenantID("flip");
+			using (var flip = Create.TenantContainer())
+			{
+				using (var child_of_flip = Create.NewContainer())
+				{
+					Assert.IsFalse(flip.IsRoot, "must not be a root container");
+					Assert.IsTrue(flip.IsTenant, "must be a tenant");
+
+					Assert.IsFalse(child_of_flip.IsRoot, "child of flip must not be a root container");
+					Assert.IsTrue(child_of_flip.IsTenant, "child of flip must not be a tenant");
+
+					Assert.AreNotEqual(flip, child_of_flip, "flip and its child must not be the same container");
+					Assert.AreEqual(flip.TenantID, child_of_flip.TenantID, "flip and its child must identify with the same tenant");
+
+					// Child of tenant "flip" resolves A to C
+					var c = child_of_flip.New<A>();
+					Assert.IsInstanceOfType(c, typeof(A), "child scope should resolve type A");
+					Assert.IsInstanceOfType(c, typeof(C), "child scope should resolve type A to type C");
+					Assert.AreEqual("C", c.Name, "valid type C knows its name");
+
+					// Root continues to resolve A to B
+					var b = Container.Root.New<A>();
+					Assert.AreNotEqual(c, b);
+					Assert.IsInstanceOfType(b, typeof(A));
+					Assert.IsInstanceOfType(b, typeof(B));
+					Assert.AreEqual("B", b.Name);
+
+					// Tenants don't conflict...
+					TenantResolver.PushTenantID("flop");
+					using (var flop = Create.TenantContainer())
+					{
+						Assert.IsFalse(flop.IsRoot);
+						Assert.IsTrue(flop.IsTenant);
+						Assert.AreEqual("flop", flop.TenantID);
+
+						// Tenant "flop" resolves A to D
+						var d = flop.New<A>();
+						Assert.IsInstanceOfType(d, typeof(A));
+						Assert.IsInstanceOfType(d, typeof(D));
+						Assert.AreEqual("D", d.Name);
+					}
+				}
+			}
+		}
+
+		[TestMethod]
 		public void ResolveAsSingletonRespectedForTypesRegisteredByFactory()
 		{
 			Container.Root
-				.ForType<L>()
-					.Register((c, p) => new M())
-					.ResolveAsSingleton()
-					.End();
+							.ForType<L>()
+							.Register((c, p) => new M())
+							.ResolveAsSingleton()
+							.End();
 
 			L ell;
 			L ellell;
@@ -656,14 +661,33 @@ namespace FlitBit.IoC.Tests
 		}
 
 		[TestMethod]
+		public void SimpleContainer()
+		{
+			var root = Container.Root;
+			root.ForType<A>()
+					.Register<B>()
+					.End();
+
+			using (var c = Create.NewContainer())
+			{
+				Assert.IsNotNull(c);
+
+				var b = c.New<A>();
+				Assert.IsInstanceOfType(b, typeof(A));
+				Assert.IsInstanceOfType(b, typeof(B));
+				Assert.AreEqual("B", b.Name);
+			}
+		}
+
+		[TestMethod]
 		public void SingletonTypeDefinedInParentScopeCannotBeOverriddenInChildScope()
 		{
 			Container.Root
-				.ForType<I>()
-					.Register<J>()
-					.ResolveAsSingleton()
-					.DisallowSpecialization()
-					.End();
+							.ForType<I>()
+							.Register<J>()
+							.ResolveAsSingleton()
+							.DisallowSpecialization()
+							.End();
 
 			I a;
 			I b;
@@ -676,15 +700,16 @@ namespace FlitBit.IoC.Tests
 					Assert.IsFalse(scope.ForType<I>().CanSpecializeRegistration);
 
 					scope.ForType<I>()
-						.Register((c, p) => new K())
-						.End();
+							.Register((c, p) => new K())
+							.End();
 					Assert.Fail("Should have blown up when trying to specialize the registration for typeof I");
 				}
 				catch (ContainerRegistryException e)
 				{
 					Assert.AreEqual(
-						String.Concat("The type is registered in an outer scope and its registration cannot be specialized: ", typeof(I).GetReadableFullName()),
-						e.Message);
+												 String.Concat("The type does not allow specialized registrations: ",
+																			typeof(I).GetReadableFullName()),
+												e.Message);
 				}
 
 				a = scope.New<I>();

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FlitBit.IoC.Tests
@@ -9,82 +6,70 @@ namespace FlitBit.IoC.Tests
 	[TestClass]
 	public class AutoConstructorInjectionFromRegistrations
 	{
-		public interface A
+		[TestMethod]
+		public void Multiple_Argument_Constructor_Stack_Fails_Auto_Injection()
 		{
-			string AlphaString { get; set; }
-		}
-
-		public class Beta : A
-		{
-			public string AlphaString { get; set; }
-
-			public Beta() { }
-
-			public Beta(string alphaString)
+			using (var c = Create.NewContainer())
 			{
-				AlphaString = alphaString;
+				c.ForType<A>().Register<Beta>().End();
+				c.ForType<E>().Register<Foxtrot>().End();
+				//c.ForType<I>().Register<Juliett>().End();
+				c.ForType<O>().Register<Papa>().End();
+				c.ForType<U>().Register<Victor>().End();
+
+				try
+				{
+					Create.New<U>();
+					Assert.Fail("Expected ContainerException");
+				}
+				catch (Exception ce)
+				{
+					Assert.IsInstanceOfType(ce, typeof(ContainerException));
+				}
 			}
 		}
 
-		public interface E
+		[TestMethod]
+		public void Multiple_Argument_Constructor_Stack_Gets_Auto_Injected()
 		{
-			int EchoInt { get; set; }
-		}
-
-		public class Foxtrot : E
-		{
-			public int EchoInt { get; set; }
-		}
-
-		public interface I
-		{
-			A Alpha { get; set; }
-			string IndiaString { get; set; }
-		}
-
-		public class Juliett : I
-		{
-			public A Alpha { get; set; }
-
-			public string IndiaString { get; set; }
-
-			public Juliett(A alpha)
+			using (var c = Create.NewContainer())
 			{
-				Alpha = alpha;
+				c.ForType<A>().Register<Beta>().End();
+				c.ForType<E>().Register<Foxtrot>().End();
+				c.ForType<I>().Register<Juliett>().End();
+				c.ForType<O>().Register<Papa>().End();
+				c.ForType<U>().Register<Victor>().End();
+
+				var uniform = Create.New<U>();
+				Assert.IsNotNull(uniform);
+				Assert.IsNotNull(uniform.Echo);
+				Assert.IsNotNull(uniform.Oscar);
+				Assert.IsNotNull(uniform.Oscar.India);
+				Assert.IsNotNull(uniform.Oscar.India.Alpha);
 			}
 		}
 
-		public interface O
+		[TestMethod]
+		public void Multiple_Argument_Constructor_Stack_Gets_Auto_Injected_With_Defaults()
 		{
-			I India { get; set; }
-		}
-
-		public class Papa : O
-		{
-			public I India { get; set; }
-
-			public Papa(I india)
+			using (var c = Create.NewContainer())
 			{
-				India = india;
-			}
-		}
+				c.ForType<A>()
+				.Register<Beta>(Param.FromValue("AlphaBeta"))
+				.End();
+				c.ForType<E>().Register<Foxtrot>().End();
+				c.ForType<I>().Register<Juliett>().End();
+				c.ForType<O>().Register<Papa>().End();
+				c.ForType<U>().Register<Victor>().End();
 
-		public interface U
-		{
-			O Oscar { get; set; }
-			E Echo { get; set; }
-		}
-
-		public class Victor : U
-		{
-			public O Oscar { get; set; }
-
-			public E Echo { get; set; }
-
-			public Victor(O oscar, E echo)
-			{
-				Oscar = oscar;
-				Echo = echo;
+				var uniform = Create.New<U>();
+				Assert.IsNotNull(uniform);
+				Assert.IsNotNull(uniform.Echo);
+				Assert.IsNotNull(uniform.Oscar);
+				Assert.IsNotNull(uniform.Oscar.India);
+				Assert.IsNotNull(uniform.Oscar.India.Alpha);
+				Assert.IsNotNull(uniform.Oscar.India.Alpha.AlphaString);
+				Assert.AreEqual("AlphaBeta", uniform.Oscar.India.Alpha.AlphaString);
 			}
 		}
 
@@ -118,71 +103,94 @@ namespace FlitBit.IoC.Tests
 			}
 		}
 
-		[TestMethod]
-		public void Multiple_Argument_Constructor_Stack_Gets_Auto_Injected()
+		public interface A
 		{
-			using (var c = Create.NewContainer())
-			{
-				c.ForType<A>().Register<Beta>().End();
-				c.ForType<E>().Register<Foxtrot>().End();
-				c.ForType<I>().Register<Juliett>().End();
-				c.ForType<O>().Register<Papa>().End();
-				c.ForType<U>().Register<Victor>().End();
-
-				var uniform = Create.New<U>();
-				Assert.IsNotNull(uniform);
-				Assert.IsNotNull(uniform.Echo);
-				Assert.IsNotNull(uniform.Oscar);
-				Assert.IsNotNull(uniform.Oscar.India);
-				Assert.IsNotNull(uniform.Oscar.India.Alpha);
-			}
+			string AlphaString { get; set; }
 		}
 
-		[TestMethod]
-		public void Multiple_Argument_Constructor_Stack_Gets_Auto_Injected_With_Defaults()
+		public class Beta : A
 		{
-			using (var c = Create.NewContainer())
-			{
-				c.ForType<A>()
-					.Register<Beta>(Param.Value("AlphaBeta"))
-					.End();
-				c.ForType<E>().Register<Foxtrot>().End();
-				c.ForType<I>().Register<Juliett>().End();
-				c.ForType<O>().Register<Papa>().End();
-				c.ForType<U>().Register<Victor>().End();
+			public Beta() { }
 
-				var uniform = Create.New<U>();
-				Assert.IsNotNull(uniform);
-				Assert.IsNotNull(uniform.Echo);
-				Assert.IsNotNull(uniform.Oscar);
-				Assert.IsNotNull(uniform.Oscar.India);
-				Assert.IsNotNull(uniform.Oscar.India.Alpha);
-				Assert.IsNotNull(uniform.Oscar.India.Alpha.AlphaString);
-				Assert.AreEqual("AlphaBeta", uniform.Oscar.India.Alpha.AlphaString);
-			}
+			public Beta(string alphaString) { AlphaString = alphaString; }
+
+			#region A Members
+
+			public string AlphaString { get; set; }
+
+			#endregion
 		}
 
-		[TestMethod]
-		public void Multiple_Argument_Constructor_Stack_Fails_Auto_Injection()
+		public interface E
 		{
-			using (var c = Create.NewContainer())
-			{
-				c.ForType<A>().Register<Beta>().End();
-				c.ForType<E>().Register<Foxtrot>().End();
-				//c.ForType<I>().Register<Juliett>().End();
-				c.ForType<O>().Register<Papa>().End();
-				c.ForType<U>().Register<Victor>().End();
+			int EchoInt { get; set; }
+		}
 
-				try
-				{
-					var uniform = Create.New<U>();
-					Assert.Fail("Expected ContainerException");
-				}
-				catch (Exception ce)
-				{
-					Assert.IsInstanceOfType(ce, typeof(ContainerException));					
-				} 
+		public class Foxtrot : E
+		{
+			#region E Members
+
+			public int EchoInt { get; set; }
+
+			#endregion
+		}
+
+		public interface I
+		{
+			A Alpha { get; set; }
+			string IndiaString { get; set; }
+		}
+
+		public class Juliett : I
+		{
+			public Juliett(A alpha) { Alpha = alpha; }
+
+			#region I Members
+
+			public A Alpha { get; set; }
+
+			public string IndiaString { get; set; }
+
+			#endregion
+		}
+
+		public interface O
+		{
+			I India { get; set; }
+		}
+
+		public class Papa : O
+		{
+			public Papa(I india) { India = india; }
+
+			#region O Members
+
+			public I India { get; set; }
+
+			#endregion
+		}
+
+		public interface U
+		{
+			E Echo { get; set; }
+			O Oscar { get; set; }
+		}
+
+		public class Victor : U
+		{
+			public Victor(O oscar, E echo)
+			{
+				Oscar = oscar;
+				Echo = echo;
 			}
+
+			#region U Members
+
+			public O Oscar { get; set; }
+
+			public E Echo { get; set; }
+
+			#endregion
 		}
 	}
 }

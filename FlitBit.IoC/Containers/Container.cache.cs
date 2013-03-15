@@ -1,5 +1,7 @@
 ﻿#region COPYRIGHT© 2009-2013 Phillip Clark. All rights reserved.
+
 // For licensing information see License.txt (MIT style licensing).
+
 #endregion
 
 using System;
@@ -11,48 +13,47 @@ namespace FlitBit.IoC.Containers
 {
 	internal partial class Container : Disposable, IContainer
 	{
-		Lazy<ConcurrentDictionary<object, object>> _localCaches = new Lazy<ConcurrentDictionary<object, object>>(LazyThreadSafetyMode.PublicationOnly);
+		readonly Lazy<ConcurrentDictionary<object, object>> _localCaches =
+			new Lazy<ConcurrentDictionary<object, object>>(LazyThreadSafetyMode.PublicationOnly);
 
-		public C EnsureCache<K, C>(K key, Func<C> factory)
+		#region IContainer Members
+
+		public TCache EnsureCache<TKey, TCache>(TKey key, Func<TCache> factory)
 		{
 			if (_parent != null && _options.HasFlag(CreationContextOptions.InheritCache))
 			{
 				return _parent.EnsureCache(key, factory);
 			}
-			else
-			{
-				var caches = _localCaches.Value;
-				return (C)caches.GetOrAdd(key, ignored => factory());
-			}
+			var caches = this._localCaches.Value;
+			return (TCache) caches.GetOrAdd(key, ignored => factory());
 		}
 
-		public C EnsureCache<K, C>(K key)
-			where C : new()
+		public TCache EnsureCache<TKey, TCache>(TKey key)
+			where TCache : new()
 		{
 			if (_parent != null && _options.HasFlag(CreationContextOptions.InheritCache))
 			{
-				return _parent.EnsureCache<K, C>(key);
+				return _parent.EnsureCache<TKey, TCache>(key);
 			}
-			else
-			{
-				var caches = _localCaches.Value;
-				return (C)caches.GetOrAdd(key, ignored => new C());
-			}
+			var caches = this._localCaches.Value;
+			return (TCache) caches.GetOrAdd(key, ignored => new TCache());
 		}
 
-		public bool TryGetCache<K, C>(K key, out C cache)
-			where C : new()
+		public bool TryGetCache<TKey, TCache>(TKey key, out TCache cache)
+			where TCache : new()
 		{
 			if (_options.HasFlag(CreationContextOptions.EnableCaching))
 			{
 				var caches = _localCaches.Value;
 				object instance;
 				var result = caches.TryGetValue(key, out instance);
-				cache = (C)instance;
+				cache = (TCache) instance;
 				return result;
 			}
-			cache = default(C);
+			cache = default(TCache);
 			return false;
 		}
+
+		#endregion
 	}
 }

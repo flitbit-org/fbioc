@@ -1,5 +1,7 @@
 ﻿#region COPYRIGHT© 2009-2013 Phillip Clark. All rights reserved.
+
 // For licensing information see License.txt (MIT style licensing).
+
 #endregion
 
 using System;
@@ -8,12 +10,12 @@ using System.Diagnostics.Contracts;
 namespace FlitBit.IoC
 {
 	/// <summary>
-	/// Various Type extensions.
+	///   Various Type extensions.
 	/// </summary>
 	public static class TypeExtensions
 	{
 		/// <summary>
-		/// Gets the fully qualified, human readable name for a delegate.
+		///   Gets the fully qualified, human readable name for a delegate.
 		/// </summary>
 		/// <param name="d"></param>
 		/// <returns></returns>

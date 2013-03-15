@@ -1,21 +1,22 @@
 ﻿#region COPYRIGHT© 2009-2013 Phillip Clark. All rights reserved.
+
 // For licensing information see License.txt (MIT style licensing).
+
 #endregion
 
 using System;
 using System.Diagnostics.Contracts;
 using System.Threading;
 
-
 namespace FlitBit.IoC.Registry
 {
-	internal class FactoryTypeRegistration<T, C> : TypeRegistration<T>
-		where C : T
+	internal class FactoryTypeRegistration<T, TConcrete> : TypeRegistration<T>
+		where TConcrete : T
 	{
-		readonly Func<IContainer, Param[], C> _factory;
+		readonly Func<IContainer, Param[], TConcrete> _factory;
 		readonly Lazy<IResolver<T>> _resolver;
-		
-		internal FactoryTypeRegistration(IContainer container, Func<IContainer, Param[], C> factory)
+
+		internal FactoryTypeRegistration(IContainer container, Func<IContainer, Param[], TConcrete> factory)
 			: base(container)
 		{
 			Contract.Requires<ArgumentNullException>(factory != null);
@@ -24,35 +25,18 @@ namespace FlitBit.IoC.Registry
 			_resolver = new Lazy<IResolver<T>>(ConfigureResolver, LazyThreadSafetyMode.ExecutionAndPublication);
 		}
 
-		public override IResolver UntypedResolver { get { return _resolver.Value; } }
-		public override IResolver<T> Resolver { get { return _resolver.Value; } }
-		protected override IResolver<T> ConstructPerRequestResolver()
+		public override IResolver<T> Resolver
 		{
-			return new FactoryResolver<T, C>(_factory);			
-		}
-		protected override IResolver<T> ConstructPerScopeResolver()
-		{
-			return new FactoryInstancePerScopeResolver<T, C>(_factory);
-		}
-		protected override IResolver<T> ConstructSingletonResolver()
-		{
-			return new FactorySingletonResolver<T, C>(this.Container, _factory);
-		}
-	}
-
-	internal sealed class NamedFactoryTypeRegistration<T, C> : FactoryTypeRegistration<T, C>, INamedTypeRegistration<T>
-		where C : T
-	{
-		internal NamedFactoryTypeRegistration(IContainer container, string name, Func<IContainer, Param[], C> factory)
-			: base(container, factory)
-		{
-			Contract.Requires<ArgumentNullException>(name != null);
-			Contract.Requires<ArgumentException>(name.Length > 0);
-
-			base.IsNamed = true;
-			this.Name = name;
+			get { return _resolver.Value; }
 		}
 
-		public string Name { get; private set; }
+		public override IResolver UntypedResolver
+		{
+			get { return _resolver.Value; }
+		}
+
+		protected override IResolver<T> ConstructPerRequestResolver() { return new FactoryResolver<T, TConcrete>(_factory); }
+		protected override IResolver<T> ConstructPerScopeResolver() { return new FactoryInstancePerScopeResolver<T, TConcrete>(_factory); }
+		protected override IResolver<T> ConstructSingletonResolver() { return new FactorySingletonResolver<T, TConcrete>(this.Container, _factory); }
 	}
 }
