@@ -95,7 +95,16 @@ namespace FlitBit.IoC
 		{
 			Contract.Requires<ArgumentNullException>(c != null);
 			Contract.Requires<ArgumentNullException>(mutator != null);
-			var res = NewInit<T>(c).Init(source);
+			T res;
+			var cloneable = source as ICloneable;
+			if (cloneable != null)
+			{
+				res = (T)cloneable.Clone();
+			}
+			else
+			{
+				res = NewInit<T>(c).Init(source);
+			}
 			return mutator(c, res);
 		}
 
@@ -113,7 +122,16 @@ namespace FlitBit.IoC
 		{
 			Contract.Requires<ArgumentNullException>(c != null);
 			Contract.Requires<ArgumentNullException>(mutator != null);
-			var res = NewInit<T>(c, tracking).Init(source);
+			T res;
+			var cloneable = source as ICloneable;
+			if (cloneable != null)
+			{
+				res = (T) cloneable.Clone();
+			}
+			else
+			{
+				res = NewInit<T>(c, tracking).Init(source);
+			}
 			return mutator(c, res);
 		}
 
@@ -140,7 +158,17 @@ namespace FlitBit.IoC
 		public static T NewCopy<T, TSource>(this IContainer c, TSource source)
 		{
 			Contract.Requires<ArgumentNullException>(c != null);
-			return NewInit<T>(c, LifespanTracking.Default).Init(source);
+			T res;
+			var cloneable = source as ICloneable;
+			if (cloneable != null)
+			{
+				res = (T)cloneable.Clone();
+			}
+			else
+			{
+				res = NewInit<T>(c, LifespanTracking.Default).Init(source);
+			}
+			return res;
 		}
 
 		/// <summary>
@@ -155,7 +183,17 @@ namespace FlitBit.IoC
 		public static T NewCopy<T, TSource>(this IContainer c, TSource source, LifespanTracking tracking)
 		{
 			Contract.Requires<ArgumentNullException>(c != null);
-			return NewInit<T>(c, tracking).Init(source);
+			T res;
+			var cloneable = source as ICloneable;
+			if (cloneable != null)
+			{
+				res = (T)cloneable.Clone();
+			}
+			else
+			{
+				res = NewInit<T>(c, tracking).Init(source);
+			}
+			return res;
 		}
 
 		/// <summary>
