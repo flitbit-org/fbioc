@@ -82,8 +82,15 @@ namespace FlitBit.IoC.Containers
 			return true;
 		}
 
-		protected IContainer MakeChildContainer(CreationContextOptions options, bool isTenant, object tenantID) { return new Container(this, options, isTenant, tenantID); }
-		bool IsStereotype<T>() { return typeof(T).IsDefined(typeof(AutoImplementedAttribute), true); }
+		protected IContainer MakeChildContainer(CreationContextOptions options, bool isTenant, object tenantID)
+		{
+			return new Container(this, options, isTenant, tenantID);
+		}
+
+		bool IsStereotype<T>()
+		{
+			return typeof(T).IsDefined(typeof(AutoImplementedAttribute), true);
+		}
 
 		bool LateDynamicTryAutomaticRegisterType(Type type)
 		{
@@ -104,7 +111,9 @@ namespace FlitBit.IoC.Containers
 
 			if (t.IsInterface)
 			{
-				foreach (var intf in t.GetInterfaces().Where(i => i.IsGenericType).Reverse())
+				foreach (var intf in t.GetInterfaces()
+															.Where(i => i.IsGenericType)
+															.Reverse())
 				{
 					generic = intf.GetGenericTypeDefinition();
 					if (r.IsTypeRegistered(generic))
@@ -122,7 +131,9 @@ namespace FlitBit.IoC.Containers
 					return ResolveGenericAsRegistered<T>(generic, tracking);
 				}
 
-				foreach (var intf in t.GetInterfaces().Where(i => i.IsGenericType).Reverse())
+				foreach (var intf in t.GetInterfaces()
+															.Where(i => i.IsGenericType)
+															.Reverse())
 				{
 					generic = intf.GetGenericTypeDefinition();
 					if (r.IsTypeRegistered(generic))
@@ -139,7 +150,8 @@ namespace FlitBit.IoC.Containers
 
 		T ResolveGenericAsRegistered<T>(Type generic, LifespanTracking tracking)
 		{
-			var r = Registry.ForGenericType(generic).ResolverFor<T>();
+			var r = Registry.ForGenericType(generic)
+											.ResolverFor<T>();
 			T instance;
 			if (r.TryResolve(this, tracking, null, out instance))
 			{
@@ -163,16 +175,19 @@ namespace FlitBit.IoC.Containers
 										ITypeRegistration reg;
 										if (impl != null)
 										{
-											reg = self.ForType<T>().Register(impl);
+											reg = self.ForType<T>()
+																.Register(impl);
 										}
 										else if (factory != null)
 										{
-											reg = self.ForType<T>().Register((c, p) => factory());
+											reg = self.ForType<T>()
+																.Register((c, p) => factory());
 										}
 										else
 										{
 											throw new ContainerException(
-												String.Concat(attr.GetType().GetReadableFullName(),
+												String.Concat(attr.GetType()
+																					.GetReadableFullName(),
 																			" failed provide either an instance or a functor for requested type: ",
 																			typeof(T).GetReadableFullName()
 													));
@@ -374,7 +389,10 @@ namespace FlitBit.IoC.Containers
 			throw new ContainerException(String.Concat("Cannot resolve type: ", typeof(T).GetReadableFullName()));
 		}
 
-		public IContainer MakeChildContainer(CreationContextOptions options) { return new Container(this, options); }
+		public IContainer MakeChildContainer(CreationContextOptions options)
+		{
+			return new Container(this, options);
+		}
 
 		public ICleanupScope Scope { get; private set; }
 
@@ -384,7 +402,10 @@ namespace FlitBit.IoC.Containers
 			return this;
 		}
 
-		T IFactory.CreateInstance<T>() { return this.New<T>(); }
+		T IFactory.CreateInstance<T>()
+		{
+			return this.New<T>();
+		}
 
 		public bool CanConstruct<T>()
 		{
@@ -404,7 +425,17 @@ namespace FlitBit.IoC.Containers
 
 		public IFactory Next { get; set; }
 
-		public object ParallelShare() { return ShareContainer(); }
+		public object ParallelShare()
+		{
+			return ShareContainer();
+		}
+
+		public void RegisterImplementationType<T, TImpl>() where TImpl : T
+		{
+			this.ForType<T>()
+					.Register<TImpl>()
+					.End();
+		}
 
 		#endregion
 	}

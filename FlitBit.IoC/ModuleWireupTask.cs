@@ -21,7 +21,7 @@ namespace FlitBit.IoC
 		///   Creates a new instance.
 		/// </summary>
 		public ModuleWireupTask()
-			: base(WireupPhase.BeforeTasks) { }
+			: base(WireupPhase.BeforeDependencies) { }
 
 		/// <summary>
 		///   Performs wireup.
