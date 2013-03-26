@@ -9,6 +9,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Threading;
+using FlitBit.Core.Factory;
 using FlitBit.IoC.Meta;
 using FlitBit.IoC.Registry;
 using FlitBit.Wireup;
@@ -105,7 +106,7 @@ namespace FlitBit.IoC.Containers
 			}
 			throw new ContainerException("No such tenant.");
 		}
-
+																																													 
 		public IContainer ResolveTenantByID(object tenant)
 		{
 			var tenants = _tenantContainers.Value;
@@ -145,6 +146,8 @@ namespace FlitBit.IoC.Containers
 				method.Invoke(cra, new object[] {this});
 			}
 		}
+
+		public override IFactory Next { get; set; }
 
 		#endregion
 	}

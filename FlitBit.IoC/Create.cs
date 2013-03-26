@@ -115,7 +115,7 @@ namespace FlitBit.IoC
 		///   Creates a new container scoped by the current container.
 		/// </summary>
 		/// <returns></returns>
-		public static IContainer NewContainer() { return NewContainer(CreationContextOptions.None); }
+		public static IContainer NewContainer() { return Container.Current.MakeChildContainer(CreationContextOptions.None); }
 
 		/// <summary>
 		///   Creates a new container scoped by the current container.

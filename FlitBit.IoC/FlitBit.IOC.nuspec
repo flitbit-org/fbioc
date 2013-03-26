@@ -4,13 +4,13 @@
     <id>$id$</id>
     <version>$version$</version>
     <title>$title$</title>
-    <authors>Phillip Clark, Eli Mumford</authors>
+    <authors>Phillip Clark</authors>
     <owners>flitbit.org</owners>
     <licenseUrl>http://fbioc.codeplex.com/license</licenseUrl>
     <projectUrl>http://fbioc.codeplex.com/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>v2.7.0 Code cleanup; slight refactor to remove some redundant interfaces.</releaseNotes>
+    <releaseNotes>v2.8.1 Better implementation of IFactory - no longer loses registrations made to early during bootstrap/wireup.</releaseNotes>
     <copyright>Copyright 2013</copyright>
   </metadata>
 </package>

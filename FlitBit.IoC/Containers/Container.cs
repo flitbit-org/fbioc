@@ -86,12 +86,7 @@ namespace FlitBit.IoC.Containers
 		{
 			return new Container(this, options, isTenant, tenantID);
 		}
-
-		bool IsStereotype<T>()
-		{
-			return typeof(T).IsDefined(typeof(AutoImplementedAttribute), true);
-		}
-
+		
 		bool LateDynamicTryAutomaticRegisterType(Type type)
 		{
 			var dyn = CachedTryAutomaticRegisterType.MakeGenericMethod(type);
@@ -162,8 +157,7 @@ namespace FlitBit.IoC.Containers
 		}
 
 		bool TryAutoRegisterFromStereotype<T>()
-		{
-			var self = this;
+		{	
 			lock (typeof(T).GetLockForType())
 			{
 				if (
@@ -171,17 +165,20 @@ namespace FlitBit.IoC.Containers
 									.Cast<AutoImplementedAttribute>()
 									.Any(attr => attr.GetImplementation<T>(this, (impl, factory) =>
 									{
-										// use the implementation type if provided
+										// Use the implementation type if provided;
+										// register auto-types with the root.
 										ITypeRegistration reg;
 										if (impl != null)
 										{
-											reg = self.ForType<T>()
-																.Register(impl);
+											reg = IoC.Container.Root
+												.ForType<T>()
+												.Register(impl);
 										}
 										else if (factory != null)
 										{
-											reg = self.ForType<T>()
-																.Register((c, p) => factory());
+											reg = IoC.Container.Root
+												.ForType<T>()
+												.Register((c, p) => factory());
 										}
 										else
 										{
@@ -214,16 +211,39 @@ namespace FlitBit.IoC.Containers
 
 		bool TryAutomaticRegisterType<T>()
 		{
-			if (typeof(T).IsAbstract)
+			// 1. if it has a stereotype, see if we can register from stereotypical behavior...
+			if (typeof(T).IsDefined(typeof(AutoImplementedAttribute), true)
+				&& TryAutoRegisterFromStereotype<T>())
 			{
-				return false;
+				return true;
 			}
 
-			Registry
-				.ForType<T>()
-				.DynamicRegister<T>()
-				.End();
-			return true;
+			// 1. Check the sink chain...
+			var next = this.Next;
+			if (next != null)
+			{
+				if (next.CanConstruct<T>())
+				{
+					// Lift registrations made to the prior factory (bootstrap time);
+					// register with root so they are available to all containers.
+					IoC.Container.Root.Registry
+						.ForType<T>()
+						.Register(next.GetImplementationType<T>())
+						.End();
+					return true;
+				}
+			}
+			// 2. It is concrete with public constructor...
+			if (!typeof(T).IsAbstract)
+			{						 
+				Registry
+					.ForType<T>()
+					.DynamicRegister<T>()
+					.End();
+				return true;
+			}
+			
+			return false;
 		}
 
 		bool TryResolveWithoutRecursion<T>(LifespanTracking tracking, out T instance)
@@ -278,30 +298,19 @@ namespace FlitBit.IoC.Containers
 			{
 				return instance;
 			}
-			// Fallback #1: if it is a class, see if we can construct it...
-			if (typeof(T).IsClass)
+			if (TryAutomaticRegisterType<T>()
+				&& TryResolveWithoutRecursion(tracking, out instance))
 			{
-				if (TryAutomaticRegisterType<T>()
-					&& TryResolveWithoutRecursion(tracking, out instance))
-				{
-					return instance;
-				}
+				return instance;
 			}
-			// Fallback #2: if it has a stereotype, see if we can register from stereotypical behavior...
-			if (IsStereotype<T>())
-			{
-				if (TryAutoRegisterFromStereotype<T>()
-					&& TryResolveWithoutRecursion(tracking, out instance))
-				{
-					return instance;
-				}
-			}
-			// Fallback #3: if it is a generic type, see if we can resolve the generic...			
+			
+			// Last chance; if it is generic, see if we can resolve the generic...			
 			if (typeof(T).IsGenericType)
 			{
 				return ResolveGeneric<T>(tracking);
 			}
 
+			
 			throw new ContainerException(String.Concat("Cannot resolve type: ", typeof(T).GetReadableFullName()));
 		}
 
@@ -410,7 +419,7 @@ namespace FlitBit.IoC.Containers
 		public bool CanConstruct<T>()
 		{
 			IResolver<T> r;
-			return Registry.TryGetResolverForType(out r);
+			return Registry.TryGetResolverForType(out r) || TryAutomaticRegisterType<T>();
 		}
 
 		public Type GetImplementationType<T>()
@@ -420,10 +429,15 @@ namespace FlitBit.IoC.Containers
 			{
 				return r.TargetType;
 			}
+			// register on demand...
+			if (TryAutomaticRegisterType<T>() && Registry.TryGetResolverForType(out r))
+			{
+				return r.TargetType;
+			}
 			return null;
 		}
 
-		public IFactory Next { get; set; }
+		public virtual IFactory Next { get { return IoC.Container.Root.Next; } set { IoC.Container.Root.Next = value; } }
 
 		public object ParallelShare()
 		{
@@ -432,7 +446,9 @@ namespace FlitBit.IoC.Containers
 
 		public void RegisterImplementationType<T, TImpl>() where TImpl : T
 		{
-			this.ForType<T>()
+			// All global registrations go to the Root container;
+			// the factory mechanism doesn't support nested scopes, etc.
+			IoC.Container.Root.ForType<T>()
 					.Register<TImpl>()
 					.End();
 		}
