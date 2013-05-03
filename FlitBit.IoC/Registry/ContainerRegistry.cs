@@ -15,10 +15,14 @@ namespace FlitBit.IoC.Registry
 		readonly ConcurrentDictionary<Type, ITypeRegistry> _registrations = new ConcurrentDictionary<Type, ITypeRegistry>();
 
 		internal ContainerRegistry(IContainer container)
-			: base(container) { }
+			: base(container)
+		{}
 
 		internal ContainerRegistry(IContainer container, IContainerRegistry baseRegistry)
-			: base(container) { BaseRegistry = baseRegistry; }
+			: base(container)
+		{
+			BaseRegistry = baseRegistry;
+		}
 
 		IContainerRegistry BaseRegistry { get; set; }
 
@@ -71,7 +75,10 @@ namespace FlitBit.IoC.Registry
 
 		#region IContainerRegistry Members
 
-		public ITypeRegistry<T> ForType<T>() { return AddOrGetTypeRegistry(typeof(T), c => new TypeRegistry<T>(c)); }
+		public ITypeRegistry<T> ForType<T>()
+		{
+			return AddOrGetTypeRegistry(typeof(T), c => new TypeRegistry<T>(c));
+		}
 
 		public IGenericTypeRegistry ForGenericType(Type generic)
 		{
@@ -174,6 +181,12 @@ namespace FlitBit.IoC.Registry
 			}
 			value = null;
 			return false;
+		}
+
+		public ITypeRegistry UntypedRegistryFor(Type type)
+		{
+			return AddOrGetTypeRegistry<ITypeRegistry>(type,
+																								c => (ITypeRegistry) Activator.CreateInstance(typeof(TypeRegistry<>).MakeGenericType(type), c));
 		}
 
 		#endregion

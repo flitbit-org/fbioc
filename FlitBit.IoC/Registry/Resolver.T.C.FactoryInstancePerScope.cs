@@ -41,7 +41,6 @@ namespace FlitBit.IoC.Registry
 				}
 				if (_containerInstances.TryAdd(key, temp))
 				{
-
 					container.Scope.AddAction(() =>
 					{
 						T value;

@@ -25,10 +25,7 @@ namespace FlitBit.IoC.Registry
 			this.RegisteredType = registeredType;
 		}
 
-		public ITypeRegistration UntypedRegistration
-		{
-			get { return Util.VolatileRead(ref _current); }
-		}
+		public ITypeRegistration UntypedRegistration { get { return Util.VolatileRead(ref _current); } }
 
 		protected virtual void CheckedSetRegistration(ITypeRegistration reg, ITypeRegistration current)
 		{
@@ -104,6 +101,8 @@ namespace FlitBit.IoC.Registry
 			CheckedSetRegistration(reg, current);
 			return reg;
 		}
+
+		public abstract ITypeRegistration RegisterUntypedFactory(Func<IContainer, Param[], object> factory);
 
 		#endregion
 	}

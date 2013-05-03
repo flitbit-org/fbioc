@@ -209,11 +209,64 @@ namespace FlitBit.IoC.Containers
 			return false;
 		}
 
-		bool TryAutomaticRegisterType<T>()
+		bool TryAutoRegisterFromStereotype(Type type)
+		{
+			lock (type.GetLockForType())
+			{
+				if (
+					type.GetCustomAttributes(typeof(AutoImplementedAttribute), false)
+									.Cast<AutoImplementedAttribute>()
+									.Any(attr => attr.GetImplementation(this, type, (impl, factory) =>
+									{
+										// Use the implementation type if provided;
+										// register auto-types with the root.
+										ITypeRegistration reg;
+										if (impl != null)
+										{
+											reg = IoC.Container.Root
+												.Registry.UntypedRegistryFor(type)
+												.Register(impl);
+										}
+										else if (factory != null)
+										{
+											reg = IoC.Container.Root
+												.Registry.UntypedRegistryFor(type)
+												.RegisterUntypedFactory((c, p) => factory());
+										}
+										else
+										{
+											throw new ContainerException(
+												String.Concat(attr.GetType()
+																					.GetReadableFullName(),
+																			" failed provide either an instance or a functor for requested type: ",
+																			type.GetReadableFullName()
+													));
+										}
+										switch (attr.RecommemdedScope)
+										{
+											case InstanceScopeKind.ContainerScope:
+												reg.ResolveAnInstancePerScope();
+												break;
+											case InstanceScopeKind.Singleton:
+												reg.ResolveAsSingleton();
+												break;
+											default:
+												reg.ResolveAnInstancePerRequest();
+												break;
+										}
+									})))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		bool TryAutomaticRegisterType(Type type)
 		{
 			// 1. if it has a stereotype, see if we can register from stereotypical behavior...
-			if (typeof(T).IsDefined(typeof(AutoImplementedAttribute), true)
-				&& TryAutoRegisterFromStereotype<T>())
+			if (type.IsDefined(typeof(AutoImplementedAttribute), true)
+				&& TryAutoRegisterFromStereotype(type))
 			{
 				return true;
 			}
@@ -222,23 +275,24 @@ namespace FlitBit.IoC.Containers
 			var next = this.Next;
 			if (next != null)
 			{
-				if (next.CanConstruct<T>())
+				if (next.CanConstruct(type))
 				{
 					// Lift registrations made to the prior factory (bootstrap time);
 					// register with root so they are available to all containers.
+
 					IoC.Container.Root.Registry
-						.ForType<T>()
-						.Register(next.GetImplementationType<T>())
+						.UntypedRegistryFor(type)
+						.Register(next.GetImplementationType(type))
 						.End();
 					return true;
 				}
 			}
 			// 2. It is concrete with public constructor...
-			if (!typeof(T).IsAbstract)
+			if (!type.IsAbstract)
 			{						 
 				Registry
-					.ForType<T>()
-					.DynamicRegister<T>()
+					.UntypedRegistryFor(type)
+					.Register(type)
 					.End();
 				return true;
 			}
@@ -298,7 +352,7 @@ namespace FlitBit.IoC.Containers
 			{
 				return instance;
 			}
-			if (TryAutomaticRegisterType<T>()
+			if (TryAutomaticRegisterType(typeof(T))
 				&& TryResolveWithoutRecursion(tracking, out instance))
 			{
 				return instance;
@@ -327,7 +381,7 @@ namespace FlitBit.IoC.Containers
 			}
 			else
 			{
-				if (TryAutomaticRegisterType<T>())
+				if (TryAutomaticRegisterType(typeof(T)))
 				{
 					return NewWithParams<T>(tracking, parameters);
 				}
@@ -419,7 +473,18 @@ namespace FlitBit.IoC.Containers
 		public bool CanConstruct<T>()
 		{
 			IResolver<T> r;
-			return Registry.TryGetResolverForType(out r) || TryAutomaticRegisterType<T>();
+			return Registry.TryGetResolverForType(out r) || TryAutomaticRegisterType(typeof(T));
+		}
+
+		public bool CanConstruct(Type type)
+		{
+			IResolver r;
+			return Registry.TryGetResolverForType(type, out r) || LateDynamicTryAutomaticRegisterType(type);
+		}
+
+		public Type GetImplementationType(Type type)
+		{
+			throw new NotImplementedException();
 		}
 
 		public Type GetImplementationType<T>()
@@ -430,7 +495,7 @@ namespace FlitBit.IoC.Containers
 				return r.TargetType;
 			}
 			// register on demand...
-			if (TryAutomaticRegisterType<T>() && Registry.TryGetResolverForType(out r))
+			if (TryAutomaticRegisterType(typeof(T)) && Registry.TryGetResolverForType(out r))
 			{
 				return r.TargetType;
 			}

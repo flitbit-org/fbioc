@@ -28,7 +28,8 @@ namespace FlitBit.IoC.Registry
 			new Lazy<ConcurrentDictionary<string, INamedTypeRegistration<T>>>(LazyThreadSafetyMode.ExecutionAndPublication);
 
 		public TypeRegistry(IContainer container)
-			: this(container, null, null) { }
+			: this(container, null, null)
+		{}
 
 		public TypeRegistry(IContainer container, ITypeRegistration<T> current, IEnumerable<INamedTypeRegistration<T>> named)
 			: base(container, typeof(T), current)
@@ -42,10 +43,7 @@ namespace FlitBit.IoC.Registry
 			}
 		}
 
-		ITypeRegistration<T> Current
-		{
-			get { return (ITypeRegistration<T>) this.UntypedRegistration; }
-		}
+		ITypeRegistration<T> Current { get { return (ITypeRegistration<T>) this.UntypedRegistration; } }
 
 		public bool TryResolve(IContainer container, LifespanTracking tracking, out T instance, params Param[] parameters)
 		{
@@ -139,7 +137,8 @@ namespace FlitBit.IoC.Registry
 			var current = Current;
 			CheckCanSpecializeRegistration(current);
 			var res =
-				(ITypeRegistration<T>) this._genericMake.Value.MakeGenericMethod(type).Invoke(this, new object[] {parameters});
+				(ITypeRegistration<T>) this._genericMake.Value.MakeGenericMethod(type)
+																	.Invoke(this, new object[] {parameters});
 			CheckedSetRegistration(res, current);
 			return res;
 		}
@@ -227,9 +226,16 @@ namespace FlitBit.IoC.Registry
 			return false;
 		}
 
-		public override IResolver UntypedResolver
+		public override IResolver UntypedResolver { get { return Resolver; } }
+
+		public override ITypeRegistration RegisterUntypedFactory(Func<IContainer, Param[], object> factory)
 		{
-			get { return Resolver; }
+			var current = Current;
+			CheckCanSpecializeRegistration(current);
+
+			var reg = new UntypedFactoryTypeRegistration<T>(Container, factory);
+			CheckedSetRegistration(reg, current);
+			return reg;
 		}
 
 		#endregion

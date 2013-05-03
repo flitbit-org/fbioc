@@ -42,5 +42,12 @@ namespace FlitBit.IoC
 		///   registration).
 		/// </returns>
 		ITypeRegistration Register(Type concreteType, params Param[] parameters);
+
+		/// <summary>
+		/// Registers a factory returning an untyped instance of the registered type.
+		/// </summary>
+		/// <param name="factory"></param>
+		/// <returns></returns>
+		ITypeRegistration RegisterUntypedFactory(Func<IContainer, Param[], object> factory);
 	}
 }

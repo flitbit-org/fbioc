@@ -28,6 +28,13 @@ namespace FlitBit.IoC
 		ITypeRegistry<T> ForType<T>();
 
 		/// <summary>
+		/// Gets the registry specific to the <paramref name="type"/> provided.
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		ITypeRegistry UntypedRegistryFor(Type type);
+
+		/// <summary>
 		///   Determines if type T is registered.
 		/// </summary>
 		/// <typeparam name="T">type T</typeparam>

@@ -91,6 +91,11 @@ namespace FlitBit.IoC.Registry
 			return res;
 		}
 
+		public ITypeRegistration RegisterUntypedFactory(Func<IContainer, Param[], object> factory)
+		{
+			throw new NotImplementedException();
+		}
+
 		public IResolver UntypedResolver
 		{
 			get { throw new NotImplementedException(); }
