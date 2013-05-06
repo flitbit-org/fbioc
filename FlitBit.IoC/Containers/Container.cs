@@ -156,59 +156,6 @@ namespace FlitBit.IoC.Containers
 			throw new ContainerException(String.Concat("Cannot resolve generic type: ", typeof(T).GetReadableFullName()));
 		}
 
-		bool TryAutoRegisterFromStereotype<T>()
-		{	
-			lock (typeof(T).GetLockForType())
-			{
-				if (
-					typeof(T).GetCustomAttributes(typeof(AutoImplementedAttribute), false)
-									.Cast<AutoImplementedAttribute>()
-									.Any(attr => attr.GetImplementation<T>(this, (impl, factory) =>
-									{
-										// Use the implementation type if provided;
-										// register auto-types with the root.
-										ITypeRegistration reg;
-										if (impl != null)
-										{
-											reg = IoC.Container.Root
-												.ForType<T>()
-												.Register(impl);
-										}
-										else if (factory != null)
-										{
-											reg = IoC.Container.Root
-												.ForType<T>()
-												.Register((c, p) => factory());
-										}
-										else
-										{
-											throw new ContainerException(
-												String.Concat(attr.GetType()
-																					.GetReadableFullName(),
-																			" failed provide either an instance or a functor for requested type: ",
-																			typeof(T).GetReadableFullName()
-													));
-										}
-										switch (attr.RecommemdedScope)
-										{
-											case InstanceScopeKind.ContainerScope:
-												reg.ResolveAnInstancePerScope();
-												break;
-											case InstanceScopeKind.Singleton:
-												reg.ResolveAsSingleton();
-												break;
-											default:
-												reg.ResolveAnInstancePerRequest();
-												break;
-										}
-									})))
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-
 		bool TryAutoRegisterFromStereotype(Type type)
 		{
 			lock (type.GetLockForType())
@@ -468,6 +415,11 @@ namespace FlitBit.IoC.Containers
 		T IFactory.CreateInstance<T>()
 		{
 			return this.New<T>();
+		}
+
+		public object CreateInstance(Type type)
+		{
+			return this.NewUntyped(LifespanTracking.Default, type);
 		}
 
 		public bool CanConstruct<T>()
