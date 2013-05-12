@@ -34,6 +34,7 @@ namespace FlitBit.IoC.Tests
 
 	public partial class ContainerTests
 	{
+
 		[TestMethod]
 		public void RegistrationCanBeMadeForOpenGenerics()
 		{

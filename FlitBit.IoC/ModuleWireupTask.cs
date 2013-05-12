@@ -7,6 +7,7 @@
 using FlitBit.IoC;
 using FlitBit.Wireup;
 using FlitBit.Wireup.Meta;
+using FlitBit.Wireup.Recording;
 
 [assembly: ModuleWireupTask]
 
@@ -27,7 +28,8 @@ namespace FlitBit.IoC
 		///   Performs wireup.
 		/// </summary>
 		/// <param name="coordinator"></param>
-		protected override void PerformTask(IWireupCoordinator coordinator)
+		/// <param name="context"></param>
+		protected override void PerformTask(IWireupCoordinator coordinator, WireupContext context)
 		{
 			// Attach the root container as a wireup observer...
 			coordinator.RegisterObserver(Container.Root);

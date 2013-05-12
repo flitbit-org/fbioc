@@ -7,6 +7,7 @@
 using System;
 using FlitBit.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FlitBit.Wireup;
 
 namespace FlitBit.IoC.Tests
 {
@@ -495,7 +496,20 @@ namespace FlitBit.IoC.Tests
 		}
 
 		[TestInitialize]
-		public void Init() { }
+		public void Init()
+		{
+			
+		}
+
+		[TestCleanup]
+		public void Cleanup()
+		{
+			var report = WireupCoordinator.Instance.ReportWireupHistory();
+			TestContext.WriteLine("---------- Wireup Report ----------");
+			TestContext.WriteLine(report);
+		}
+
+		public TestContext TestContext { get; set; }
 
 		[TestMethod]
 		public void InstacesCreatedInGlobalScopeDontParticipateInCleanup()

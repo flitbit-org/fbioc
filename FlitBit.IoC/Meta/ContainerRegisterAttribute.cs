@@ -11,6 +11,7 @@ using FlitBit.Core;
 using FlitBit.Emit;
 using FlitBit.Wireup;
 using FlitBit.Wireup.Meta;
+using FlitBit.Wireup.Recording;
 
 namespace FlitBit.IoC.Meta
 {
@@ -132,7 +133,8 @@ namespace FlitBit.IoC.Meta
 		///   Performs the wireup task.
 		/// </summary>
 		/// <param name="coordinator"></param>
-		protected override void PerformTask(IWireupCoordinator coordinator)
+		/// <param name="context"></param>
+		protected override void PerformTask(IWireupCoordinator coordinator, WireupContext context)
 		{
 			// Purposely does nothing; the IoC's root container is wired up as an
 			// observer and will perform any required work during notification.

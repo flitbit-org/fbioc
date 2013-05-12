@@ -66,7 +66,7 @@ namespace FlitBit.IoC
 				var root = LazyRoot.Value;
 				if (!__initialized)
 				{
-					WireupCoordinator.Instance.WireupDependencies(Assembly.GetExecutingAssembly());
+					WireupCoordinator.SelfConfigure();
 					__initialized = true;
 				}
 				return root;

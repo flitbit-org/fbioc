@@ -5,6 +5,7 @@
 #endregion
 
 using System;
+using FlitBit.Wireup;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FlitBit.IoC.Tests
@@ -12,6 +13,16 @@ namespace FlitBit.IoC.Tests
 	[TestClass]
 	public class ParamTests
 	{
+		[TestCleanup]
+		public void Cleanup()
+		{
+			var report = WireupCoordinator.Instance.ReportWireupHistory();
+			TestContext.WriteLine("---------- Wireup Report ----------");
+			TestContext.WriteLine(report);
+		}
+
+		public TestContext TestContext { get; set; }
+
 		[TestMethod]
 		public void ContainerCanCreateInstanceAndMatchAmongMultipleConstructors()
 		{
