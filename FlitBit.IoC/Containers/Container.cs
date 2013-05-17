@@ -436,7 +436,12 @@ namespace FlitBit.IoC.Containers
 
 		public Type GetImplementationType(Type type)
 		{
-			throw new NotImplementedException();
+			if (!Registry.IsTypeRegistered(type))
+			{
+				TryAutomaticRegisterType(type);
+			}
+			var reg = Registry.UntypedRegistryFor(type);
+			return reg != null ? reg.UntypedResolver.TargetType : null;
 		}
 
 		public Type GetImplementationType<T>()
