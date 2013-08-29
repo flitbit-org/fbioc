@@ -21,9 +21,9 @@ namespace FlitBit.IoC.Containers
 {
 	internal partial class Container
 	{
-		static readonly MethodInfo CachedTryAutomaticRegisterType =
-			typeof(Container).MatchGenericMethod("TryAutomaticRegisterType", BindingFlags.NonPublic | BindingFlags.Instance, 1,
-																					typeof(void));
+		//static readonly MethodInfo CachedTryAutomaticRegisterType =
+		//    typeof(Containers.Container)
+		//        .GetMethod("TryAutomaticRegisterType", BindingFlags.NonPublic | BindingFlags.Instance);
 
 		readonly CreationContextOptions _options;
 		readonly IContainer _parent;
@@ -85,12 +85,6 @@ namespace FlitBit.IoC.Containers
 		protected IContainer MakeChildContainer(CreationContextOptions options, bool isTenant, object tenantID)
 		{
 			return new Container(this, options, isTenant, tenantID);
-		}
-		
-		bool LateDynamicTryAutomaticRegisterType(Type type)
-		{
-			var dyn = CachedTryAutomaticRegisterType.MakeGenericMethod(type);
-			return (bool) dyn.Invoke(this, null);
 		}
 
 		T ResolveGeneric<T>(LifespanTracking tracking)
@@ -236,14 +230,14 @@ namespace FlitBit.IoC.Containers
 			}
 			// 2. It is concrete with public constructor...
 			if (!type.IsAbstract)
-			{						 
+			{
 				Registry
 					.UntypedRegistryFor(type)
 					.Register(type)
 					.End();
 				return true;
 			}
-			
+
 			return false;
 		}
 
@@ -284,7 +278,7 @@ namespace FlitBit.IoC.Containers
 			}
 			else if (targetType.IsClass)
 			{
-				if (LateDynamicTryAutomaticRegisterType(targetType))
+				if (TryAutomaticRegisterType(targetType))
 				{
 					return NewUntyped(tracking, targetType);
 				}
@@ -304,14 +298,14 @@ namespace FlitBit.IoC.Containers
 			{
 				return instance;
 			}
-			
+
 			// Last chance; if it is generic, see if we can resolve the generic...			
 			if (typeof(T).IsGenericType)
 			{
 				return ResolveGeneric<T>(tracking);
 			}
 
-			
+
 			throw new ContainerException(String.Concat("Cannot resolve type: ", typeof(T).GetReadableFullName()));
 		}
 
@@ -385,13 +379,13 @@ namespace FlitBit.IoC.Containers
 					object instance;
 					if (r.TryUntypedResolve(this, tracking, null, out instance))
 					{
-						return (T) instance;
+						return (T)instance;
 					}
 				}
 			}
 			else if (subtype.IsClass)
 			{
-				if (LateDynamicTryAutomaticRegisterType(subtype))
+				if (TryAutomaticRegisterType(subtype))
 				{
 					return NewImplementationOf<T>(tracking, subtype);
 				}
@@ -431,7 +425,7 @@ namespace FlitBit.IoC.Containers
 		public bool CanConstruct(Type type)
 		{
 			IResolver r;
-			return Registry.TryGetResolverForType(type, out r) || LateDynamicTryAutomaticRegisterType(type);
+			return Registry.TryGetResolverForType(type, out r) || TryAutomaticRegisterType(type);
 		}
 
 		public Type GetImplementationType(Type type)
