@@ -267,14 +267,14 @@ namespace FlitBit.IoC.Containers
 			IResolver r;
 			if (Registry.TryGetResolverForType(targetType, out r))
 			{
-				if (r.TargetType == targetType)
-				{
+				//if (r.TargetType == targetType)
+				//{
 					object instance;
 					if (r.TryUntypedResolve(this, tracking, null, out instance))
 					{
 						return instance;
 					}
-				}
+				//}
 			}
 			else if (targetType.IsClass)
 			{
