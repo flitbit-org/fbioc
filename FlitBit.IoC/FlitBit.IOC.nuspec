@@ -10,7 +10,7 @@
     <projectUrl>http://fbioc.codeplex.com/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>v2.8.1 Better implementation of IFactory - no longer loses registrations made to early during bootstrap/wireup.</releaseNotes>
-    <copyright>Copyright 2013</copyright>
+    <releaseNotes>v2.12 Various updates and code cleanup. Wireup dependency is not FlitBit.IoC.AssemblyWireup for consistency.</releaseNotes>
+    <copyright>Copyright 2009-2013</copyright>
   </metadata>
 </package>

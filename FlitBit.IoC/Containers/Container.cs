@@ -7,13 +7,11 @@
 using System;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using FlitBit.Core;
 using FlitBit.Core.Factory;
 using FlitBit.Core.Meta;
 using FlitBit.Core.Parallel;
-using FlitBit.Emit;
 using FlitBit.IoC.Properties;
 using FlitBit.IoC.Registry;
 
@@ -21,10 +19,6 @@ namespace FlitBit.IoC.Containers
 {
 	internal partial class Container
 	{
-		//static readonly MethodInfo CachedTryAutomaticRegisterType =
-		//    typeof(Containers.Container)
-		//        .GetMethod("TryAutomaticRegisterType", BindingFlags.NonPublic | BindingFlags.Instance);
-
 		readonly CreationContextOptions _options;
 		readonly IContainer _parent;
 		int _disposers = 1;
@@ -73,12 +67,11 @@ namespace FlitBit.IoC.Containers
 			{
 				return false;
 			}
-			if (disposing)
-			{
-				ContextFlow.TryPop<IContainer>(this);
-				var scope = this.Scope;
-				Util.Dispose(ref scope);
-			}
+			if (!disposing) return true;
+
+			ContextFlow.TryPop<IContainer>(this);
+			var scope = Scope;
+			Util.Dispose(ref scope);
 			return true;
 		}
 
@@ -89,7 +82,7 @@ namespace FlitBit.IoC.Containers
 
 		T ResolveGeneric<T>(LifespanTracking tracking)
 		{
-			var r = this.Registry;
+			var r = Registry;
 			var t = typeof(T);
 
 			var generic = t.GetGenericTypeDefinition();
@@ -213,7 +206,7 @@ namespace FlitBit.IoC.Containers
 			}
 
 			// 1. Check the sink chain...
-			var next = this.Next;
+			var next = Next;
 			if (next != null)
 			{
 				if (next.CanConstruct(type))
@@ -413,7 +406,7 @@ namespace FlitBit.IoC.Containers
 
 		public object CreateInstance(Type type)
 		{
-			return this.NewUntyped(LifespanTracking.Default, type);
+			return NewUntyped(LifespanTracking.Default, type);
 		}
 
 		public bool CanConstruct<T>()
