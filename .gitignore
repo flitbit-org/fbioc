@@ -6,3 +6,7 @@ TestResults/
 *.user
 *.version.cs
 *.log
+
+# NCrunch
+*.ncrunch*
+.*crunch*.local.xml
