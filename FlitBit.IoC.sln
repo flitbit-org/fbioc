@@ -1,15 +1,12 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlitBit.IoC", "FlitBit.IoC\FlitBit.IoC.csproj", "{42BFF8A8-A9E9-4FCB-9987-1CC9ADE928D0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlitBit.IoC.Tests", "FlitBit.IoC\FlitBit.IoC.Tests\FlitBit.IoC.Tests.csproj", "{CE27D576-4823-43A7-ADB2-6C16E6A6F62F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5F0AFBD5-182E-455F-B1D6-766A120F0441}"
 	ProjectSection(SolutionItems) = preProject
-		FlitBit.IoC.vsmdi = FlitBit.IoC.vsmdi
-		Local.testsettings = Local.testsettings
-		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 		Version.targets = Version.targets
 	EndProjectSection
 EndProject
@@ -21,9 +18,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{4C3331
 	EndProjectSection
 EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = FlitBit.IoC.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
