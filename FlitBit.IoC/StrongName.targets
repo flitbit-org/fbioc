@@ -7,5 +7,9 @@
 		<StrongNameSigningKeyFile>$(APPDATA)\FlitBit\FlitBitStrongName.pfx</StrongNameSigningKeyFile>
 		<SignAssembly Condition="Exists('$(StrongNameSigningKeyFile)')">true</SignAssembly>
 		<AssemblyOriginatorKeyFile Condition="Exists('$(StrongNameSigningKeyFile)')">$(StrongNameSigningKeyFile)</AssemblyOriginatorKeyFile>
-	</PropertyGroup>	
+	</PropertyGroup>
+	<ItemGroup>
+    <Compile Condition="'$(SignAssembly)' != 'true' AND Exists('Properties\AssemblyInfo.internals.cs')" Include="Properties\AssemblyInfo.internals.cs" />
+    <Compile Condition="'$(SignAssembly)' == 'true' AND Exists('Properties\AssemblyInfo.internals.signed.cs')" Include="Properties\AssemblyInfo.internals.signed.cs" />
+	</ItemGroup>
 </Project>
