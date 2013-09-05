@@ -84,7 +84,7 @@ namespace FlitBit.IoC.Registry
 		ITypeRegistration<T> MakeConcreteRegistrationFor<TConcrete>(Param[] parameters) where TConcrete : T
 		{
 			ITypeRegistration<T> result;
-			if (typeof(TConcrete).IsInterface || typeof(TConcrete).IsAbstract)
+			if (typeof(TConcrete).IsAbstract)
 			{
 				// Abstract types resolved via the current container...
 				result = new FactoryTypeRegistration<T, TConcrete>(Container, (c, p) => c.New<TConcrete>());

@@ -678,18 +678,21 @@ namespace FlitBit.IoC.Tests
 		public void SimpleContainer()
 		{
 			var root = Container.Root;
-			root.ForType<A>()
+			using (var outer = Create.NewContainer())
+			{
+				outer.ForType<A>()
 					.Register<B>()
 					.End();
 
-			using (var c = Create.NewContainer())
-			{
-				Assert.IsNotNull(c);
+				using (var c = Create.NewContainer())
+				{
+					Assert.IsNotNull(c);
 
-				var b = c.New<A>();
-				Assert.IsInstanceOfType(b, typeof(A));
-				Assert.IsInstanceOfType(b, typeof(B));
-				Assert.AreEqual("B", b.Name);
+					var b = c.New<A>();
+					Assert.IsInstanceOfType(b, typeof(A));
+					Assert.IsInstanceOfType(b, typeof(B));
+					Assert.AreEqual("B", b.Name);
+				}
 			}
 		}
 
@@ -744,6 +747,13 @@ namespace FlitBit.IoC.Tests
 			Assert.IsInstanceOfType(cc, typeof(J));
 			Assert.AreEqual("J", cc.Name);
 			Assert.AreSame(b, cc);
+		}
+
+		[TestMethod]
+		public void ValueTypesTest()
+		{
+			if (Container.Current.CanConstruct<int>())
+				Container.Current.CreateInstance<int>();
 		}
 	}
 }
