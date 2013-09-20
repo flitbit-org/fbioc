@@ -6,3 +6,7 @@ TestResults/
 *.user
 *.version.cs
 *.log
+
+_NCrunch*
+_ReSharper*
+
