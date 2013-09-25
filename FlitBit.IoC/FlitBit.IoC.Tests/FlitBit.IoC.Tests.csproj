@@ -120,6 +120,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoConstructorInjectionFromRegistrations.cs" />
+    <Compile Include="ContainerCreateUntypedTests.cs" />
     <Compile Include="ContainerTests.cs" />
     <Compile Include="ContainerTests.OpenGenerics.cs" />
     <Compile Include="CopyConstructTests.cs" />
