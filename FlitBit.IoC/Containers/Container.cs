@@ -260,7 +260,7 @@ namespace FlitBit.IoC.Containers
 			IResolver r;
 			if (Registry.TryGetResolverForType(targetType, out r))
 			{
-				if (r.TargetType == targetType)
+				if (targetType.IsAssignableFrom(r.TargetType))
 				{
 					object instance;
 					if (r.TryUntypedResolve(this, tracking, null, out instance))

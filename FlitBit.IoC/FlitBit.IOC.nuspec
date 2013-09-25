@@ -10,7 +10,7 @@
     <projectUrl>http://fbioc.codeplex.com/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>v2.12 Various updates and code cleanup. Wireup dependency is not FlitBit.IoC.AssemblyWireup for consistency.</releaseNotes>
+    <releaseNotes>Fixed bug in container's NewUntyped implementation; now correctly using assignability instead of equality to determin if an implementation implements a type.</releaseNotes>
     <copyright>Copyright 2009-2013</copyright>
   </metadata>
 </package>
