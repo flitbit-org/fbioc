@@ -205,22 +205,6 @@ namespace FlitBit.IoC.Containers
 				return true;
 			}
 
-			// 1. Check the sink chain...
-			var next = Next;
-			if (next != null)
-			{
-				if (next.CanConstruct(type))
-				{
-					// Lift registrations made to the prior factory (bootstrap time);
-					// register with root so they are available to all containers.
-
-					IoC.Container.Root.Registry
-						.UntypedRegistryFor(type)
-						.Register(next.GetImplementationType(type))
-						.End();
-					return true;
-				}
-			}
 			// 2. It is concrete with public constructor...
 			if (!type.IsAbstract)
 			{
@@ -276,6 +260,10 @@ namespace FlitBit.IoC.Containers
 					return NewUntyped(tracking, targetType);
 				}
 			}
+			else if (Next != null && Next.CanConstruct(targetType))
+			{
+				return Next.CreateInstance(targetType);
+			}
 			throw new ContainerException(String.Concat("Cannot resolve type: ", targetType.GetReadableFullName()));
 		}
 
@@ -298,6 +286,10 @@ namespace FlitBit.IoC.Containers
 				return ResolveGeneric<T>(tracking);
 			}
 
+			if (Next != null && Next.CanConstruct<T>())
+			{
+				return Next.CreateInstance<T>();
+			}
 
 			throw new ContainerException(String.Concat("Cannot resolve type: ", typeof(T).GetReadableFullName()));
 		}
@@ -313,12 +305,17 @@ namespace FlitBit.IoC.Containers
 					return instance;
 				}
 			}
-			else
+			if (TryAutomaticRegisterType(typeof(T)) && Registry.TryGetResolverForType(out registration))
 			{
-				if (TryAutomaticRegisterType(typeof(T)))
+				T instance;
+				if (registration.TryResolve(this, tracking, null, out instance, parameters))
 				{
-					return NewWithParams<T>(tracking, parameters);
+					return instance;
 				}
+			}
+			if (Next != null && Next.CanConstruct<T>())
+			{
+				return Next.CreateInstance<T>();
 			}
 			throw new ContainerException(String.Concat("Cannot resolve type: ", typeof(T).GetReadableFullName()));
 		}
@@ -376,11 +373,15 @@ namespace FlitBit.IoC.Containers
 					}
 				}
 			}
-			else if (subtype.IsClass)
+			else if (subtype.IsClass && Registry.TryGetResolverForType(subtype, out r))
 			{
-				if (TryAutomaticRegisterType(subtype))
+				if (r.TargetType == subtype)
 				{
-					return NewImplementationOf<T>(tracking, subtype);
+					object instance;
+					if (r.TryUntypedResolve(this, tracking, null, out instance))
+					{
+						return (T)instance;
+					}
 				}
 			}
 			throw new ContainerException(String.Concat("Cannot resolve type: ", typeof(T).GetReadableFullName()));
@@ -412,13 +413,19 @@ namespace FlitBit.IoC.Containers
 		public bool CanConstruct<T>()
 		{
 			IResolver<T> r;
-			return Registry.TryGetResolverForType(out r) || TryAutomaticRegisterType(typeof(T));
+			Type type = typeof(T);
+			return IsValidType(type) && (Registry.TryGetResolverForType(out r) || TryAutomaticRegisterType(type));
 		}
 
 		public bool CanConstruct(Type type)
 		{
 			IResolver r;
-			return Registry.TryGetResolverForType(type, out r) || TryAutomaticRegisterType(type);
+			return IsValidType(type) && (Registry.TryGetResolverForType(type, out r) || TryAutomaticRegisterType(type));
+		}
+
+		private bool IsValidType(Type type)
+		{
+			return !type.IsValueType;
 		}
 
 		public Type GetImplementationType(Type type)
