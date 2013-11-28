@@ -6,11 +6,11 @@
     <title>$title$</title>
     <authors>Phillip Clark</authors>
     <owners>flitbit.org</owners>
-    <licenseUrl>http://fbioc.codeplex.com/license</licenseUrl>
-    <projectUrl>http://fbioc.codeplex.com/</projectUrl>
+    <licenseUrl>https://raw.github.com/flitbit-org/fbioc/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/flitbit-org/fbioc</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Fixed bug in container's NewUntyped implementation; now correctly using assignability instead of equality to determin if an implementation implements a type.</releaseNotes>
+    <releaseNotes>Moved repository to github. Updated for wireup auto-stamp via nuget.</releaseNotes>
     <copyright>Copyright 2009-2013</copyright>
   </metadata>
 </package>

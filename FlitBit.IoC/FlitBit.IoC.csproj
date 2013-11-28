@@ -127,7 +127,7 @@
     <Compile Include="Constructors\DefaultConstructorAdapter.cs" />
     <Compile Include="Constructors\FactoryConstructorAdapter.cs" />
     <Compile Include="Container.static.cs" />
-    <None Include="ExternalWireup\Dependency.FlitBit.IoC.cs.pp" />
+    <Content Include="ExternalWireup\Dependency.FlitBit.IoC.cs.pp" />
     <Compile Include="ExternalWireup\Dependency.FlitBit.Wireup.cs" />
     <Compile Include="Factory\FactoryProvider.cs" />
     <Compile Include="Meta\ContainerRegisterAttribute.cs" />
