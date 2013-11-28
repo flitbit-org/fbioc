@@ -6,13 +6,4 @@ TestResults/
 *.user
 *.version.cs
 *.log
-
-<<<<<<< HEAD
-# NCrunch
-*.ncrunch*
-.*crunch*.local.xml
-=======
-_NCrunch*
-_ReSharper*
-
->>>>>>> 7dcbca1624547d775f00b46b946fa21503241efa
+*.nupkg

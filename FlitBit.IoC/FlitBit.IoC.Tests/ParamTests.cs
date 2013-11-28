@@ -13,13 +13,6 @@ namespace FlitBit.IoC.Tests
 	[TestClass]
 	public class ParamTests
 	{
-		[TestCleanup]
-		public void Cleanup()
-		{
-			var report = WireupCoordinator.Instance.ReportWireupHistory();
-			TestContext.WriteLine("---------- Wireup Report ----------");
-			TestContext.WriteLine(report);
-		}
 
 		public TestContext TestContext { get; set; }
 

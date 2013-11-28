@@ -3,8 +3,6 @@ using FlitBit.Wireup;
 using FlitBit.Wireup.Meta;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-[assembly: WireupDependency(typeof(FlitBit.IoC.AssemblyWireup))]
-
 namespace FlitBit.IoC.Tests.Examples
 {
 	public interface IBeNamed

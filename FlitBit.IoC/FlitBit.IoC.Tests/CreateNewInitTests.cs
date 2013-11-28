@@ -10,7 +10,6 @@ namespace FlitBit.IoC.Tests
 		[TestInitialize]
 		public void Init()
 		{
-			WireupCoordinator.SelfConfigure();
 			FactoryProvider.Factory.RegisterImplementationType<IHuman, Human>();
 			FactoryProvider.Factory.RegisterImplementationType<ISneakyHuman, SneakyHuman>();
 			FactoryProvider.Factory.RegisterImplementationType<INinja, Ninja>();
