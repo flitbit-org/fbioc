@@ -63,13 +63,13 @@ namespace FlitBit.IoC.Containers
 			readonly List<Action<Type, T, string, CreationEventKind>> _observers =
 				new List<Action<Type, T, string, CreationEventKind>>();
 
-			readonly List<WeakReference<T>> _instances;
+			readonly List<Core.WeakReference<T>> _instances;
 
 			public ObservationKey(bool tracking)
 			{
 				if (tracking)
 				{
-					_instances = new List<WeakReference<T>>();
+          _instances = new List<Core.WeakReference<T>>();
 				}
 			}
 
@@ -77,7 +77,7 @@ namespace FlitBit.IoC.Containers
 			{
 				if (_instances != null)
 				{
-					_instances.Add(new WeakReference<T>(instance));
+          _instances.Add(new Core.WeakReference<T>(instance));
 				}
 				foreach (var observer in _observers)
 				{

@@ -81,7 +81,7 @@ namespace FlitBit.IoC.Containers
 				{
 					break;
 				}
-				var temp = MakeChildContainer(CreationContextOptions.EnableCaching, true, tenantID);
+				var temp = new Container(this, CreationContextOptions.EnableCaching, true, tenantID, true);
 				if (tenants.TryAdd(tenantID, temp))
 				{
 					tenant = temp;

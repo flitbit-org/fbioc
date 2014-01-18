@@ -5,6 +5,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading;
@@ -23,6 +24,117 @@ namespace FlitBit.IoC.Containers
 		readonly IContainer _parent;
 		int _disposers = 1;
 
+
+    internal class CleanupScopeContextFlowProvider : IContextFlowProvider
+    {
+      static readonly Lazy<CleanupScopeContextFlowProvider> Provider =
+        new Lazy<CleanupScopeContextFlowProvider>(CreateAndRegisterContextFlowProvider, LazyThreadSafetyMode.ExecutionAndPublication);
+
+      static CleanupScopeContextFlowProvider CreateAndRegisterContextFlowProvider()
+      {
+        var res = new CleanupScopeContextFlowProvider();
+        ContextFlow.RegisterProvider(res);
+        return res;
+      }
+
+      [ThreadStatic]
+      static Stack<CleanupScope> __scopes;
+
+      public CleanupScopeContextFlowProvider()
+      {
+        this.ContextKey = Guid.NewGuid();
+      }
+
+      public Guid ContextKey
+      {
+        get;
+        private set;
+      }
+
+      public object Capture()
+      {
+        var top = Peek();
+        if (top != null)
+        {
+          return top.ShareScope();
+        }
+        return null;
+      }
+
+      public void Attach(ContextFlow context, object captureKey)
+      {
+        var scope = (captureKey as CleanupScope);
+        if (scope != null)
+        {
+          if (__scopes == null)
+          {
+            __scopes = new Stack<CleanupScope>();
+          }
+          if (__scopes.Count > 0)
+          {
+            ReportAndClearOrphanedScopes(__scopes);
+          }
+          __scopes.Push(scope);
+        }
+      }
+
+      private void ReportAndClearOrphanedScopes(Stack<CleanupScope> scopes)
+      {
+        scopes.Clear();
+      }
+
+      public void Detach(ContextFlow context, object captureKey)
+      {
+        var scope = (captureKey as CleanupScope);
+        if (scope != null)
+        {
+          scope.Dispose();
+        }
+      }
+
+      internal static void Push(CleanupScope scope)
+      {
+        var dummy = Provider.Value;
+        if (__scopes == null)
+        {
+          __scopes = new Stack<CleanupScope>();
+        }
+        __scopes.Push(scope);
+      }
+
+      internal static bool TryPop(CleanupScope scope)
+      {
+        if (__scopes != null && __scopes.Count > 0)
+        {
+          if (ReferenceEquals(__scopes.Peek(), scope))
+          {
+            __scopes.Pop();
+            return true;
+          }
+        }
+        return false;
+      }
+
+      internal static CleanupScope Pop()
+      {
+        if (__scopes != null && __scopes.Count > 0)
+        {
+          return __scopes.Pop();
+        }
+        return default(CleanupScope);
+      }
+
+
+      internal static CleanupScope Peek()
+      {
+        if (__scopes != null && __scopes.Count > 0)
+        {
+          return __scopes.Peek();
+        }
+        return default(CleanupScope);
+      }
+    }
+
 		protected Container(bool isRoot)
 		{
 			IsRoot = isRoot;
@@ -33,7 +145,7 @@ namespace FlitBit.IoC.Containers
 			TenantID = null;
 			if (!isRoot)
 			{
-				ContextFlow.Push<IContainer>(this);
+				IoC.Container.ContainerContextFlowProvider.Push(this);
 			}
 		}
 
@@ -46,10 +158,10 @@ namespace FlitBit.IoC.Containers
 			Registry = new ContainerRegistry(this, parent.Registry);
 			IsTenant = parent.IsTenant;
 			TenantID = parent.TenantID;
-			ContextFlow.Push<IContainer>(this);
+      IoC.Container.ContainerContextFlowProvider.Push(this);
 		}
 
-		protected Container(IContainer parent, CreationContextOptions options, bool isTenant, object tenantID)
+		internal protected Container(IContainer parent, CreationContextOptions options, bool isTenant, object tenantID, bool isTenantRoot)
 		{
 			_parent = parent;
 			_options = options;
@@ -58,7 +170,10 @@ namespace FlitBit.IoC.Containers
 			Registry = new ContainerRegistry(this, parent.Registry);
 			IsTenant = isTenant;
 			TenantID = tenantID;
-			ContextFlow.Push<IContainer>(this);
+      if (!isTenantRoot)
+      {
+        IoC.Container.ContainerContextFlowProvider.Push(this);
+      }
 		}
 
 		protected override bool PerformDispose(bool disposing)
@@ -69,7 +184,7 @@ namespace FlitBit.IoC.Containers
 			}
 			if (!disposing) return true;
 
-			ContextFlow.TryPop<IContainer>(this);
+		  IoC.Container.ContainerContextFlowProvider.TryPop(this);
 			var scope = Scope;
 			Util.Dispose(ref scope);
 			return true;
@@ -77,7 +192,7 @@ namespace FlitBit.IoC.Containers
 
 		protected IContainer MakeChildContainer(CreationContextOptions options, bool isTenant, object tenantID)
 		{
-			return new Container(this, options, isTenant, tenantID);
+			return new Container(this, options, isTenant, tenantID, false);
 		}
 
 		T ResolveGeneric<T>(LifespanTracking tracking)

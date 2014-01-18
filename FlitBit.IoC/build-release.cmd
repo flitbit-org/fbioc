@@ -6,9 +6,10 @@
 :: -- Version History --
 ::           Version       YYYYMMDD Author         Description
 SET "version=0.0.1"      &:20120729 Phillip Clark  initial version 
-SET "version=0.0.2"      &:20131127 Phillip Clark  updated to use specified VS environ, or fallback to the latest version installed
 SET "title=Build (%~nx0) - %version%"
 TITLE %title%
+
+CALL "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"
 
 SET "DISPOSITION=DISPOSITION UNKNOWN"
 SET "UNIQUE=unknown"
@@ -48,25 +49,7 @@ IF "%PLT%" == "" (
 IF "%VRB%" == "" (
 	SET VRB="detailed"
 )
-IF "%VSE%" == "" (
-	SET VSE="11.0"
-)
-ECHO.%VSE%
-IF "%VSE%" == "11.0" (
-	IF EXIST "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\vcvarsall.bat" (
-		GOTO:load_11_vars
-	)
-)
-GOTO:load_10_vars
-	
-:load_11_vars
-CALL "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\vcvarsall.bat"
-GOTO:go_build
 
-:load_10_vars
-CALL "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\vcvarsall.bat"
-
-:go_build
 FOR %%I IN (*.csproj) DO CALL :build_csproj "%%~nxI"	
 SET "DISPOSITION=Success!"
 GOTO:EXIT
