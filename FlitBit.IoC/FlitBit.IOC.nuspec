@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/flitbit-org/fbioc</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Moved repository to github. Updated for wireup auto-stamp via nuget.</releaseNotes>
-    <copyright>Copyright 2009-2013</copyright>
+    <releaseNotes>Updated references to Core 3.2, etc.</releaseNotes>
+    <copyright>COPYRIGHT© 2009-2014 Phillip Clark. All rights reserved.</copyright>
   </metadata>
 </package>
