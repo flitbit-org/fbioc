@@ -96,17 +96,17 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\FlitBit.Copy.3.0.0\lib\net451\FlitBit.Copy.dll</HintPath>
     </Reference>
-    <Reference Include="FlitBit.Core, Version=3.2.0.0, Culture=neutral, PublicKeyToken=38f03d0878531ff3, processorArchitecture=MSIL">
+    <Reference Include="FlitBit.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=38f03d0878531ff3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\FlitBit.Core.3.2.0\lib\net451\FlitBit.Core.dll</HintPath>
+      <HintPath>..\packages\FlitBit.Core.3.3.0\lib\net451\FlitBit.Core.dll</HintPath>
     </Reference>
     <Reference Include="FlitBit.Emit, Version=3.0.0.0, Culture=neutral, PublicKeyToken=38f03d0878531ff3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\FlitBit.Emit.3.0.0\lib\net451\FlitBit.Emit.dll</HintPath>
     </Reference>
-    <Reference Include="FlitBit.Wireup, Version=3.3.0.0, Culture=neutral, PublicKeyToken=38f03d0878531ff3, processorArchitecture=MSIL">
+    <Reference Include="FlitBit.Wireup, Version=3.4.0.0, Culture=neutral, PublicKeyToken=38f03d0878531ff3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\FlitBit.Wireup.3.3.0\lib\net451\FlitBit.Wireup.dll</HintPath>
+      <HintPath>..\packages\FlitBit.Wireup.3.4.0\lib\net451\FlitBit.Wireup.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -123,6 +123,7 @@
     <Compile Include="..\AssemblyInfo.corporate.cs">
       <Link>Properties\AssemblyInfo.corporate.cs</Link>
     </Compile>
+    <Compile Include="AssemblyWireup.cs" />
     <Compile Include="Constructors\CommandBinding.cs" />
     <Compile Include="Constructors\ConstructorAdapter..cs" />
     <Compile Include="Constructors\ConstructorAdapter.T.C.cs" />
@@ -202,7 +203,6 @@
     <Compile Include="Registry\TypeRegistry.generic.cs" />
     <Compile Include="Registry\TypeRegistry.T.cs" />
     <Compile Include="Registry\TypeRegistryExtensions.cs" />
-    <Compile Include="Wireup.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
